@@ -1,0 +1,105 @@
+---
+import RootLayout from "./RootLayout.astro"
+import { RoleGuard } from "@/components/auth/RoleGuard"
+import { LogoutButton } from "@/components/common/LogoutButton"
+
+interface Props {
+  title: string
+}
+const { title } = Astro.props
+const currentYear = new Date().getFullYear()
+const base = import.meta.env.BASE_URL
+---
+
+<RootLayout
+  title={`${title} | System Admin`}
+  bodyClass="relative flex min-h-screen flex-col bg-(--wwf-white) font-sans text-(--wwf-ocean-deep) antialiased selection:bg-(--wwf-coral)/30 selection:text-(--wwf-ocean-deep)"
+>
+  <RoleGuard allowedRoles={["admin"]} client:only="react">
+    <div class="pointer-events-none fixed inset-0 z-0">
+      <img
+        src={`${base}images/bbg-test.webp`}
+        alt="Ocean Background"
+        class="h-full w-full object-cover"
+      />
+      <div
+        class="absolute inset-0 bg-linear-to-b from-[var(--wwf-ocean-deep)]/80 via-transparent to-[var(--wwf-ocean-deep)]"
+      >
+      </div>
+    </div>
+
+    <div class="pointer-events-none fixed inset-0 z-10 overflow-hidden">
+      <img
+        src={`${base}images/blue-fish.webp`}
+        alt=""
+        class="absolute top-20 -right-10 w-24 opacity-15 transition-transform duration-1000 sm:w-32 md:w-48 lg:-right-10 lg:opacity-60"
+      />
+      <img
+        src={`${base}images/svgs/dark-blue-coral.svg`}
+        alt=""
+        class="absolute top-[50%] -left-10 w-20 opacity-15 sm:w-24 md:w-32 lg:-left-10 lg:opacity-60"
+      />
+      <img
+        src={`${base}images/octopus.webp`}
+        alt=""
+        class="absolute -right-10 bottom-10 w-32 opacity-10 transition-transform duration-1000 sm:w-40 md:w-56 lg:-right-12 lg:opacity-15"
+      />
+      <img
+        src={`${base}images/jelly-fish.webp`}
+        alt=""
+        class="absolute top-[15%] left-[5%] w-20 opacity-10 sm:w-28 md:w-36 lg:opacity-60"
+      />
+      <img
+        src={`${base}images/gold-fish.webp`}
+        alt=""
+        class="absolute bottom-32 left-[20%] w-16 opacity-15 sm:w-20 md:w-24 lg:opacity-60"
+      />
+    </div>
+
+    {/* Header */}
+    <header
+      class="sticky top-0 z-40 w-full border-b border-(--wwf-border) bg-white/90 shadow-sm backdrop-blur-md transition-all"
+    >
+      <div
+        class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8"
+      >
+        <div class="flex items-center gap-8">
+          <a
+            href={`${base}admin`}
+            class="group flex items-center transition-transform active:scale-95"
+          >
+            <img
+              src={`${base}images/WWF_Logo.webp`}
+              alt="WildWisdom Logo"
+              class="relative top-5 h-20 w-auto object-contain transition-opacity group-hover:opacity-90"
+            />
+          </a>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="hidden text-right sm:block">
+            <span
+              class="block text-xs font-black tracking-widest text-(--wwf-ocean-light) uppercase"
+              >Superuser Access</span
+            >
+          </div>
+          <div class="hidden h-8 w-px bg-(--wwf-border) sm:block"></div>
+          <LogoutButton client:only="react" />
+        </div>
+      </div>
+    </header>
+
+    <main
+      class="relative z-10 mx-auto w-full max-w-7xl flex-1 px-6 py-8 lg:px-8"
+    >
+      <slot />
+    </main>
+
+    <footer
+      class="relative z-10 mt-auto w-full bg-black py-6 text-center text-sm text-white"
+    >
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <p>Copyright &copy; {currentYear} WWF India All Rights Reserved</p>
+      </div>
+    </footer>
+  </RoleGuard>
+</RootLayout>

@@ -1,0 +1,58 @@
+---
+import RootLayout from "./RootLayout.astro"
+import { StudentHeaderAuth } from "@/components/common/StudentHeaderAuth"
+import { StudentNavigation } from "@/components/common/StudentNavigation"
+
+interface Props {
+  title: string
+}
+
+const { title } = Astro.props
+const currentPath = Astro.url.pathname
+const base = import.meta.env.BASE_URL.replace(/\/$/, "")
+---
+
+<RootLayout
+  title={`${title} | WildWisdom Arena`}
+  bodyClass="flex min-h-screen flex-col bg-(--wwf-white) font-sans text-(--wwf-ocean-deep) antialiased selection:bg-(--wwf-sea-green)/30 selection:text-(--wwf-ocean-deep)"
+>
+  <header
+    class="sticky top-0 z-50 w-full bg-white shadow-sm backdrop-blur-md transition-all"
+  >
+    <div
+      class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8"
+    >
+      <div class="flex items-center gap-8">
+        <a
+          href={`${base}/play/levels`}
+          class="group flex items-center transition-transform active:scale-95"
+        >
+          <img
+            src={`${base}/images/WWF_Logo.webp`}
+            alt="WildWisdom Logo"
+            class="relative top-5 h-20 w-auto object-contain transition-opacity group-hover:opacity-90"
+          />
+        </a>
+
+        <StudentNavigation
+          currentPath={currentPath}
+          base={base}
+          client:only="react"
+        />
+      </div>
+      <StudentHeaderAuth client:only="react" />
+    </div>
+  </header>
+
+  <main class="relative mx-auto flex w-full flex-1 flex-col min-h-screen">
+    <slot />
+  </main>
+
+  <footer class="mt-auto w-full bg-black py-6 text-center text-sm text-white">
+    <div class="mx-auto max-w-6xl px-6 lg:px-8">
+      <p>
+        Copyright &copy; {new Date().getFullYear()} WWF India All Rights Reserved
+      </p>
+    </div>
+  </footer>
+</RootLayout>

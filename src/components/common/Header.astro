@@ -1,0 +1,97 @@
+---
+import Container from "./Container.astro"
+import { MobileNav } from "./MobileNav"
+
+const baseUrl = import.meta.env.BASE_URL
+
+const navLinks = [
+  { name: "ABOUT", href: "#about" },
+  { name: "ANNOUNCEMENTS", href: "#announcements" },
+  { name: "RESOURCES", href: "resources" },
+  { name: "SUPPORTERS", href: "#supporters" },
+  { name: "FAQs", href: "faq" },
+]
+---
+
+<header
+  class="fixed top-0 z-999 w-full border-b border-slate-100 bg-white shadow-sm backdrop-blur-md"
+>
+  <Container class="flex h-16 items-center justify-between">
+    <div class="flex shrink-0 items-center">
+      <a
+        href={baseUrl}
+        class="transition-transform hover:scale-105 active:scale-95"
+      >
+        <img
+          src={`${baseUrl}images/WWF_Logo.webp`}
+          alt="WWF Logo"
+          class="relative top-3 h-20 w-auto md:top-5 md:h-20"
+        />
+      </a>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <nav class="hidden items-center gap-8 lg:flex">
+        <ul class="flex items-center gap-8">
+          <li>
+            <a
+              href={baseUrl}
+              class="group hover:text-coral relative font-wwf text-xl tracking-wide text-slate-800 transition-colors"
+            >
+              HOME
+              <span
+                class="bg-coral absolute -bottom-1 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
+              ></span>
+            </a>
+          </li>
+          {
+            navLinks.map((link) => (
+              <li>
+                <a
+                  href={`${baseUrl}${link.href}`}
+                  class="group hover:text-coral relative font-wwf text-xl tracking-wide text-slate-800 transition-colors"
+                >
+                  {link.name}
+                  <span class="bg-coral absolute -bottom-1 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full" />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <a
+          href={`${baseUrl}register/school`}
+          class="animate-button-pulse reg-btn bg-orange relative inline-flex items-center justify-center rounded-full px-8 py-2 font-wwf text-xl tracking-wide text-white shadow-md active:scale-95"
+        >
+          <span class="relative z-10">REGISTER NOW</span>
+        </a>
+
+        <style>
+          @keyframes button-pulse {
+            0% {
+              box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.7);
+            }
+            70% {
+              box-shadow: 0 0 0 10px rgba(255, 165, 0, 0);
+            }
+            100% {
+              box-shadow: 0 0 0 0 rgba(255, 165, 0, 0);
+            }
+          }
+
+          .animate-button-pulse {
+            animation: button-pulse 1.3s infinite cubic-bezier(0.4, 0, 0.6, 1);
+          }
+        </style>
+      </nav>
+
+      <MobileNav client:load links={navLinks} baseUrl={baseUrl} />
+    </div>
+  </Container>
+</header>
+
+<style>
+  .font-wwf {
+    font-display: swap;
+  }
+</style>

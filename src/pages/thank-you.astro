@@ -1,0 +1,66 @@
+---
+import InsidePageHero from "@/components/common/InsidePageHero.astro"
+import MainLayout from "@/layouts/main.astro"
+
+const baseUrl = import.meta.env.BASE_URL
+---
+
+<MainLayout title="Thank You">
+  <div class="grow">
+    <!-- <InsidePageHero heading="Thank You" /> -->
+    <InsidePageHero banner="images/banners/banner-2.webp" />
+
+    <section
+      class="container mx-auto max-w-3xl px-4 py-16 text-center md:py-24"
+    >
+      <div
+        class="bg-sea-green/20 text-ocean-deep ring-sea-green/10 mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full ring-8"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="48"
+          height="48"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="text-ocean-deep"
+        >
+          <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8"
+          ></path>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+          <path d="m16 19 2 2 4-4"></path>
+        </svg>
+      </div>
+
+      <h2 class="text-ocean-deep mb-4 font-wwf text-3xl md:text-4xl">
+        Registration Complete!
+      </h2>
+
+      <p
+        class="mb-5 text-lg leading-relaxed font-medium text-slate-600 md:text-xl"
+      >
+        Thank you for registering for the <span class="text-coral font-bold"
+          >Wild Wisdom Global Challenge 2026!</span
+        ><br />
+        Please check your email for the next steps and important updates.
+      </p>
+
+      <p
+        class="mb-10 text-lg leading-relaxed font-medium text-slate-600 md:text-xl"
+      >
+        Note: If you do not receive the confirmation email in your inbox, please
+        check your Spam/Junk folder as well.
+      </p>
+
+      <a
+        href={baseUrl}
+        class="btn-wwf-primary inline-flex items-center justify-center px-12 py-4 text-lg font-bold shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
+      >
+        Back to Home
+      </a>
+    </section>
+  </div>
+</MainLayout>

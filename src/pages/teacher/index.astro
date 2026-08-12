@@ -1,0 +1,8 @@
+---
+import TeacherLayout from "@/layouts/TeacherLayout.astro"
+import { UnifiedTeacherDashboard } from "@/components/teacher/UnifiedTeacherDashboard"
+---
+
+<TeacherLayout title="Dashboard">
+  <UnifiedTeacherDashboard client:only="react" />
+</TeacherLayout>

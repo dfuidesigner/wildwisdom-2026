@@ -1,0 +1,68 @@
+---
+import { TeacherLoginForm } from "@/components/auth/TeacherLoginForm"
+import { GuestGuard } from "@/components/auth/GuestGuard"
+import BlankLayout from "@/layouts/BlankLayout.astro"
+
+const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "")
+---
+
+<BlankLayout title="Faculty Portal | Sign In">
+  <GuestGuard client:only="react">
+    <div
+      class="relative flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden px-4 py-12 sm:px-6 lg:px-8 2xl:h-screen"
+    >
+      <div
+        class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={`background-image: url('${baseUrl}/images/quiz-bg.png');`}
+      >
+        <div
+          class="absolute inset-0 bg-(--wwf-ocean-deep)/70 mix-blend-multiply"
+        >
+        </div>
+        <div
+          class="absolute inset-0 bg-linear-to-b from-transparent to-(--wwf-ocean-deep)/90"
+        >
+        </div>
+      </div>
+
+      <div class="relative z-10 w-full max-w-md">
+        {/* HEADER TEXT */}
+        <div class="mb-10 flex flex-col items-center text-center">
+          <h2
+            class="font-wwf text-5xl tracking-wide text-white drop-shadow-lg sm:text-6xl"
+          >
+            Teacher Login
+          </h2>
+          <p
+            class="mt-3 text-lg font-medium text-(--wwf-sea-green) drop-shadow-md"
+          >
+            Sign in to manage your classroom.
+          </p>
+        </div>
+
+        {/* GLASSMORPHIC CARD */}
+        <div
+          class="rounded-[2.5rem] border border-white/20 bg-white/95 p-8 shadow-2xl backdrop-blur-xl sm:p-10"
+        >
+          <TeacherLoginForm client:load />
+        </div>
+
+        <!-- <div
+          class="mt-10 flex flex-col items-center justify-center gap-4 text-sm font-medium text-white/80"
+        >
+          <div
+            class="flex items-center justify-center gap-2 rounded-full bg-black/20 px-6 py-2 backdrop-blur-sm"
+          >
+            Are you a student?{" "}
+            <a
+              href={`${baseUrl}/login`}
+              class="font-bold text-(--wwf-sea-green) drop-shadow-sm transition-colors hover:text-(--wwf-teal) hover:underline"
+            >
+              Go to Student Login &rarr;
+            </a>
+          </div>
+        </div> -->
+      </div>
+    </div>
+  </GuestGuard>
+</BlankLayout>

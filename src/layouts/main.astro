@@ -1,0 +1,20 @@
+---
+import RootLayout from "./RootLayout.astro"
+import FooterSection from "@/components/common/Footer"
+import Header from "@/components/common/Header.astro"
+
+interface Props {
+  title: string
+  description?: string
+}
+
+const { title, description } = Astro.props
+---
+
+<RootLayout title={title} description={description}>
+  <Header />
+  <main class="flex-1 pt-16">
+    <slot />
+  </main>
+  <FooterSection client:visible />
+</RootLayout>

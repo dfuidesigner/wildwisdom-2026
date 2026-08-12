@@ -1,0 +1,8 @@
+---
+import StateAdminLayout from "@/layouts/StateAdminLayout.astro"
+import { StateAdminDashboard } from "@/components/admin/StateAdminDashboard"
+---
+
+<StateAdminLayout title="State Hub">
+  <StateAdminDashboard client:load />
+</StateAdminLayout>

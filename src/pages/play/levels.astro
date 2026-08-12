@@ -1,0 +1,14 @@
+---
+import StudentLayout from "@/layouts/StudentLayout.astro"
+import { LevelSelector } from "@/components/student/LevelSelector"
+---
+
+<StudentLayout title="Stage Selection">
+  <div class="relative overflow-hidden">
+    <div
+      class="absolute -top-40 right-0 -z-10 h-80 w-80 rounded-full bg-emerald-50/50 blur-3xl"
+    >
+    </div>
+    <LevelSelector client:only="react" />
+  </div>
+</StudentLayout>

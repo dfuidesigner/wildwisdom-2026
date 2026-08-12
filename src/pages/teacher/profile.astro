@@ -1,0 +1,11 @@
+---
+import TeacherLayout from "@/layouts/TeacherLayout.astro"
+import { UserProfile } from "@/components/profile/UserProfile"
+import { RoleGuard } from "@/components/auth/RoleGuard"
+---
+
+<TeacherLayout title="My Profile">
+  <RoleGuard allowedRoles={["teacher"]} client:only="react">
+    <UserProfile client:only="react" />
+  </RoleGuard>
+</TeacherLayout>

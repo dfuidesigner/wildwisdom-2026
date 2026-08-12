@@ -1,0 +1,11 @@
+---
+import StudentLayout from "@/layouts/StudentLayout.astro"
+import { UserProfile } from "@/components/profile/UserProfile"
+import { RoleGuard } from "@/components/auth/RoleGuard"
+---
+
+<StudentLayout title="My Profile">
+  <RoleGuard allowedRoles={["student"]} client:only="react">
+    <UserProfile client:only="react" />
+  </RoleGuard>
+</StudentLayout>

@@ -1,0 +1,109 @@
+---
+import { LoginForm } from "@/components/auth/LoginForm"
+import { GuestGuard } from "@/components/auth/GuestGuard"
+import StudentLayout from "@/layouts/StudentLayout.astro"
+import OceanElement from "@/components/home/OceanElement"
+
+const baseUrl = import.meta.env.BASE_URL
+---
+
+<StudentLayout title="Sign In">
+  <GuestGuard client:only="react">
+    <div
+      class="relative flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden px-4 py-12 sm:px-6 lg:px-8 2xl:h-screen"
+    >
+      <div
+        class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={`background-image: url('${baseUrl}images/oce-new.webp');`}
+      >
+      </div>
+
+      <OceanElement
+        client:visible
+        src={`${baseUrl}images/svgs/orange-stick.svg`}
+        type="float"
+        delay={0.2}
+        className="absolute top-10 left-0 w-12 opacity-70 sm:w-20 md:top-15 md:w-30 md:opacity-100 lg:w-30"
+      />
+      <OceanElement
+        client:visible
+        src={`${baseUrl}images/svgs/dark-blue-coral.svg`}
+        type="coral"
+        delay={0.5}
+        className="absolute -bottom-16 -left-5 w-25 md:-bottom-25 md:left-5 md:w-40 lg:-bottom-35 lg:left-0 lg:w-auto"
+      />
+      <OceanElement
+        client:visible
+        src={`${baseUrl}images/blue-fish.webp`}
+        type="fish"
+        delay={0}
+        className="absolute top-10 left-20 z-0 w-18 sm:left-[40%] md:left-[30%] md:w-25 lg:left-[10%] lg:w-40 xl:top-[40%] xl:left-[3%] xl:w-35"
+      />
+      <OceanElement
+        client:visible
+        src={`${baseUrl}images/gold-fish.webp`}
+        type="fish"
+        delay={1.5}
+        className="absolute top-10 right-4 z-0 w-16 sm:right-[13%] md:top-10 md:right-[8%] md:w-24 lg:right-[15%] lg:w-30 xl:right-[15%]"
+      />
+      <OceanElement
+        client:visible
+        src={`${baseUrl}images/svgs/dark-cora-right.svg`}
+        type="coral"
+        delay={0.8}
+        className="absolute right-0 bottom-0 w-10 opacity-80 sm:w-15 md:w-20 md:opacity-100 lg:w-auto"
+      />
+      <OceanElement
+        client:visible
+        src={`${baseUrl}images/pink-coral.webp`}
+        type="coral"
+        delay={1.2}
+        className="absolute -right-5 -bottom-10 w-28 md:right-5 md:-bottom-15 md:w-50 lg:-bottom-20 lg:w-auto"
+      />
+      <OceanElement
+        client:visible
+        src={`${baseUrl}images/pink-weed.webp`}
+        type="coral"
+        delay={1.2}
+        className="absolute bottom-[20%] w-15 max-[769px]:rotate-y-180! md:top-40 md:right-0 md:w-20"
+      />
+
+      <div class="relative z-10 w-full max-w-md">
+        <div class="mb-10 flex flex-col items-center text-center">
+          <h2
+            class="font-wwf text-5xl tracking-wide text-white drop-shadow-lg sm:text-6xl"
+          >
+            Welcome Back
+          </h2>
+          <p
+            class="mt-3 text-lg font-medium text-(--wwf-sea-green) drop-shadow-md"
+          >
+            Sign in to continue your adventure.
+          </p>
+        </div>
+
+        <div
+          class="rounded-[2.5rem] border border-white/20 bg-white/95 p-8 shadow-2xl backdrop-blur-xl sm:p-10"
+        >
+          <LoginForm client:only="react" />
+        </div>
+
+        <div
+          class="mt-10 flex flex-col items-center justify-center gap-4 text-sm font-medium text-white/80"
+        >
+          <div
+            class="flex items-center justify-center gap-2 rounded-full bg-black/20 px-6 py-2 backdrop-blur-sm"
+          >
+            Don't have an account?{" "}
+            <a
+              href={`${baseUrl}register/student`}
+              class="font-bold text-(--wwf-coral) drop-shadow-sm transition-colors hover:text-(--wwf-orange) hover:underline"
+            >
+              Join as Student
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </GuestGuard>
+</StudentLayout>

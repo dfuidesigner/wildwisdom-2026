@@ -1,0 +1,534 @@
+---
+import MainLayout from "@/layouts/main.astro"
+import Container from "@/components/common/Container.astro"
+import InsidePageHero from "@/components/common/InsidePageHero.astro"
+
+const baseUrl = import.meta.env.BASE_URL || "/"
+
+// Data arrays updated with chapter images
+const learningPdfs = [
+  {
+    title: "1: Marine Diversity and Distribution",
+    file: "Learning Material_Chapter1_Final.pdf",
+    image: "images/chapter/1.jpg",
+  },
+  {
+    title:
+      "2: World Beneath the Waves: Ocean Ecosystems, Habitats and Interdependence",
+    file: "Learning_material_CHAPTER 2_Final.pdf",
+    image: "images/chapter/2.jpg",
+  },
+  {
+    title:
+      "3: Life Functions Underwater: Anatomy and Life Processes of Marine Organisms",
+    file: "Learning_material_CHAPTER 3_Final.pdf",
+    image: "images/chapter/3.jpg",
+  },
+  {
+    title: "4: Challenges to Ocean Health",
+    file: "Learning_material_CHAPTER 5_Final.pdf",
+    image: "images/chapter/4.jpg",
+  },
+  {
+    title: "5: Human-Ocean Interactions and Conservation Stewardship",
+    file: "Learning_material_CHAPTER 6_Final.pdf",
+    image: "images/chapter/5.jpg",
+  },
+  {
+    title: "6: Learning Material Bibliography",
+    file: "Learning Material_Bibliography.pdf",
+    image: "images/chapter/6.png",
+  },
+]
+
+const webinars = [
+  {
+    session:
+      "Webinar 1 An Ocean Odyssey- Fantastic Giants and Where to Find Them???",
+    speaker:
+      "Dr. Anant Pande - Head- Oceans & Coasts Conservation, WWF-India. ",
+    status: "LIVE",
+    src: "webinar-1.mp4",
+  },
+]
+---
+
+<MainLayout title="Resource Centre">
+  <InsidePageHero banner="images/banners/banner-1.webp" />
+
+  {/* ======================= PDF DOWNLOADS SECTION ======================= */}
+  <section class="resource-hero bg-gray-50/50 py-16 md:py-24">
+    <Container>
+      <div class="mb-12 text-center">
+        <h2
+          class="text-ocean-deep font-wwf text-3xl tracking-wide uppercase md:text-5xl"
+        >
+          <!-- Dive Into Marine Studies -->
+          Ocean Explorer’s Hub
+        </h2>
+        <p class="text-ocean-semi-dark mt-3 text-lg font-medium md:text-xl">
+          Theme: From Coastline to the Seafloor: An Ocean Odyssey.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          learningPdfs.map((pdf) => (
+            <div class="group flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+              <div class="relative h-56 overflow-hidden bg-gray-200">
+                <img
+                  src={`${baseUrl}${pdf.image}`}
+                  alt={pdf.title}
+                  class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-[#003140]/90 via-[#003140]/30 to-transparent opacity-90" />
+              </div>
+
+              <div class="flex flex-1 flex-col p-6">
+                <h3 class="mb-6 text-lg leading-snug font-bold text-[#003140]">
+                  {pdf.title}
+                </h3>
+                <a
+                  href={`${baseUrl}pdf/${pdf.file}`}
+                  target="_blank"
+                  class="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#f78623] px-4 py-3.5 text-sm font-bold tracking-wider text-white uppercase shadow-sm transition-colors hover:bg-[#f28c38]"
+                >
+                  <svg
+                    class="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    />
+                  </svg>
+                  Download
+                </a>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </Container>
+  </section>
+
+  {/* ======================= ITZA LEARNING PORTAL ======================= */}
+  <section class="from-wwf-soft/10 bg-gradient-to-b to-white py-16 md:py-24">
+    <Container>
+      <div class="flex flex-col items-center gap-12 lg:flex-row lg:gap-16">
+        {/* Left Column: Text Content */}
+        <div
+          class="flex w-full flex-col items-center gap-6 text-center lg:w-1/2 lg:items-start lg:text-left"
+        >
+          <h2
+            class="font-wwf text-3xl leading-tight tracking-wide text-[#003140] uppercase md:text-5xl lg:text-5xl"
+          >
+            Prepare for the Wild Wisdom Global Challenge
+          </h2>
+          <p class="text-base leading-relaxed text-gray-700 md:text-lg">
+            The interactive videos and quizzes that give you the best chance of
+            reaching the WWGC Finals are now live on
+            <a
+              href="https://www.itza.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-bold text-[#259cb4] underline decoration-2 underline-offset-4 transition-colors hover:text-[#f78623]"
+            >
+              ITZA.io</a
+            >
+          </p>
+          <p class="text-base leading-relaxed text-gray-700 md:text-lg">
+            Why do dolphins name each other? Why do healthy coral reefs crackle?
+            And what tiny ocean organism produces every second breath we take?
+          </p>
+          <p class="text-base leading-relaxed text-gray-700 md:text-lg">
+            Find out the answers and get ahead before the challenge begins.
+          </p>
+          <p class="text-base leading-relaxed text-gray-700 md:text-lg">
+            Available at home or in the classroom. Free for students and
+            schools.
+          </p>
+
+          <!-- Styled CTA Button with Lucide 'arrow-right' Icon -->
+          <a
+            href="https://www.itza.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 rounded-full bg-[#259cb4] px-7 py-3.5 font-semibold text-white shadow-md transition-all duration-200 hover:bg-[#f78623] hover:shadow-lg focus:ring-2 focus:ring-[#259cb4] focus:ring-offset-2 focus:outline-none"
+          >
+            <span>Start now at itza.io</span>
+            <!-- Lucide Icon: arrow-right -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-right transition-transform duration-200 group-hover:translate-x-1"
+            >
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+        {/* Right Column: Visuals (Image & Video) */}
+        <div class="flex w-full flex-col gap-6 lg:w-1/2">
+          {/* Static Image */}
+          <!-- <div
+            class="relative overflow-hidden rounded-3xl shadow-xl transition-transform duration-500 hover:scale-[1.02]"
+          >
+            <img
+              src={`${baseUrl}images/itza-image.png`}
+              alt="ITZA Oceans Learning Journey"
+              class="h-auto w-full rounded-3xl border-4 border-white object-cover"
+            />
+          </div> -->
+
+          {/* Promo Video */}
+          <div
+            class="relative overflow-hidden rounded-3xl border-4 border-white bg-black shadow-xl transition-transform duration-500 hover:scale-[1.02]"
+          >
+            <video
+              data-src={`${baseUrl}video/video-web.mp4`}
+              poster={`${baseUrl}images/video-thumbanil.png`}
+              class="lazy-video aspect-video w-full object-cover"
+              controls
+              preload="none"></video>
+          </div>
+          <div
+            class="relative overflow-hidden rounded-3xl border-4 border-white bg-black shadow-xl transition-transform duration-500 hover:scale-[1.02]"
+          >
+            <video
+              data-src={`${baseUrl}video/video-web.mp4`}
+              poster={`${baseUrl}images/video-thumbanil.png`}
+              class="lazy-video aspect-video w-full object-cover"
+              controls
+              preload="none"></video>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  {/* ======================= PRACTICE QUIZ ======================= */}
+  <!-- <section class="bg-ocean-deep relative overflow-hidden py-20 md:py-32">
+    <div class="absolute inset-0 opacity-40 mix-blend-overlay">
+      <img
+        src={`${baseUrl}images/hero-banner.webp`}
+        alt="Ocean bg"
+        class="h-full w-full object-cover"
+      />
+    </div>
+    <Container
+      class="relative z-10 flex flex-col items-center gap-6 text-center"
+    >
+      <h2
+        class="font-wwf text-3xl tracking-wide text-white uppercase drop-shadow-md md:text-5xl"
+      >
+        Take part in the practice quiz!
+      </h2>
+      <p class="max-w-2xl text-lg text-white drop-shadow-md md:text-xl">
+        Think you know the ocean? Take the quiz, test your knowledge, and see
+        how you measure up against the best!
+      </p>
+      <div class="mt-6 flex flex-col gap-4 sm:flex-row">
+        <a
+          href="https://wildwisdom.wwfindia.org/play/levels"
+          target="_blank"
+          class="text-ocean-deep hover:bg-sea-green inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-wwf text-xl tracking-wide shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:scale-95"
+        >
+          <span class="wwf-span-font">Practice Quiz</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg
+          >
+        </a>
+      </div>
+    </Container>
+  </section> -->
+
+  {
+    /* ======================= ONE PLANET ACADEMY RESOURCES ======================= */
+  }
+  <section
+    class="relative overflow-hidden bg-gradient-to-b from-[var(--wwf-ocean-deep)] to-[var(--wwf-ocean-dark)] py-20 md:py-32"
+  >
+    {/* Decorative background glows */}
+    <div
+      class="absolute top-0 -left-10 h-72 w-72 rounded-full bg-[var(--wwf-ocean)] opacity-20 mix-blend-overlay blur-3xl filter"
+    >
+    </div>
+    <div
+      class="absolute -right-10 bottom-0 h-80 w-80 rounded-full bg-[var(--wwf-sea-green)] opacity-10 mix-blend-overlay blur-3xl filter"
+    >
+    </div>
+
+    <Container class="relative z-10">
+      <div class="mx-auto mb-16 max-w-4xl text-center">
+        <h2
+          class="font-wwf text-3xl tracking-wide text-[var(--wwf-sea-green)] uppercase drop-shadow-md md:text-5xl"
+        >
+          One Planet Academy Resources
+        </h2>
+        <p
+          class="mt-6 text-base leading-relaxed text-[var(--wwf-white)] md:text-xl"
+        >
+          One Planet Academy is WWF-India’s environmental education platform for
+          learners, educators, and citizens.
+        </p>
+        <p
+          class="mt-4 text-base leading-relaxed text-[var(--wwf-gray-100)] md:text-lg"
+        >
+          It brings together simple and engaging resources that help you
+          understand environmental issues and connect learning with everyday
+          life. The platform offers interactive experiences, learning materials,
+          and practical tools that make it easier to explore the environment and
+          take meaningful action in your own way.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Resource 1: Course */}
+        <div
+          class="group relative flex flex-col items-center justify-between overflow-hidden rounded-3xl border border-[var(--wwf-ocean-light)] bg-[var(--wwf-ocean-semi-dark)]/50 p-8 text-center shadow-lg backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:border-[var(--wwf-sea-green)]/50 hover:bg-[var(--wwf-ocean-deep)]/80 hover:shadow-[var(--wwf-ocean)]/20 hover:shadow-2xl"
+        >
+          <div
+            class="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[var(--wwf-ocean-light)]/40 text-[var(--wwf-sea-green)] transition-transform duration-500 group-hover:scale-110 group-hover:bg-[var(--wwf-sea-green)] group-hover:text-[var(--wwf-ocean-deep)]"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-10 w-10"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              ></path>
+            </svg>
+          </div>
+          <h3
+            class="mb-4 text-2xl font-bold tracking-wide text-[var(--wwf-white)] group-hover:text-[var(--wwf-sea-green)]"
+          >
+            A Course on Marine Matters
+          </h3>
+          <p class="mb-8 text-sm leading-relaxed text-[var(--wwf-gray-100)]">
+            Dive deeper into marine ecosystems and conservation with our
+            interactive modules.
+          </p>
+          <a
+            href="https://academy.wwfindia.org/learn-for-nature/marine-matters"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mt-auto w-full rounded-full bg-[var(--wwf-orange)] px-6 py-3.5 text-sm font-bold tracking-widest text-[var(--wwf-white)] uppercase shadow-md transition-all duration-300 hover:bg-[var(--wwf-coral)] hover:shadow-lg active:scale-95"
+          >
+            View Course
+          </a>
+        </div>
+
+        {/* Resource 2: Infographics */}
+        <div
+          class="group relative flex flex-col items-center justify-between overflow-hidden rounded-3xl border border-[var(--wwf-ocean-light)] bg-[var(--wwf-ocean-semi-dark)]/50 p-8 text-center shadow-lg backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:border-[var(--wwf-sea-green)]/50 hover:bg-[var(--wwf-ocean-deep)]/80 hover:shadow-[var(--wwf-ocean)]/20 hover:shadow-2xl"
+        >
+          <div
+            class="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[var(--wwf-ocean-light)]/40 text-[var(--wwf-sea-green)] transition-transform duration-500 group-hover:scale-110 group-hover:bg-[var(--wwf-sea-green)] group-hover:text-[var(--wwf-ocean-deep)]"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-10 w-10"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              ></path>
+            </svg>
+          </div>
+          <h3
+            class="mb-4 text-2xl font-bold tracking-wide text-[var(--wwf-white)] group-hover:text-[var(--wwf-sea-green)]"
+          >
+            Infographics
+          </h3>
+          <p class="mb-8 text-sm leading-relaxed text-[var(--wwf-gray-100)]">
+            Explore beautiful visual guides mapping our fragile ocean
+            environments and their biodiversity.
+          </p>
+          <button
+            disabled
+            class="mt-auto w-full cursor-not-allowed rounded-full border border-[var(--wwf-ocean-light)] bg-[var(--wwf-ocean-light)]/30 px-6 py-3.5 text-sm font-bold tracking-widest text-[var(--wwf-gray-100)]/60 uppercase transition-colors group-hover:border-[var(--wwf-ocean)]/50"
+          >
+            Link Coming Soon
+          </button>
+        </div>
+
+        {/* Resource 3: Video */}
+        <div
+          class="group relative flex flex-col items-center justify-between overflow-hidden rounded-3xl border border-[var(--wwf-ocean-light)] bg-[var(--wwf-ocean-semi-dark)]/50 p-8 text-center shadow-lg backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:border-[var(--wwf-sea-green)]/50 hover:bg-[var(--wwf-ocean-deep)]/80 hover:shadow-[var(--wwf-ocean)]/20 hover:shadow-2xl"
+        >
+          <div
+            class="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[var(--wwf-ocean-light)]/40 text-[var(--wwf-sea-green)] transition-transform duration-500 group-hover:scale-110 group-hover:bg-[var(--wwf-sea-green)] group-hover:text-[var(--wwf-ocean-deep)]"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-10 w-10"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+              ></path>
+            </svg>
+          </div>
+          <h3
+            class="mb-4 text-2xl font-bold tracking-wide text-[var(--wwf-white)] group-hover:text-[var(--wwf-sea-green)]"
+          >
+            Video on Oceans
+          </h3>
+          <p class="mb-8 text-sm leading-relaxed text-[var(--wwf-gray-100)]">
+            Watch engaging visual stories about marine ecosystems and the
+            challenges they face.
+          </p>
+          <button
+            disabled
+            class="mt-auto w-full cursor-not-allowed rounded-full border border-[var(--wwf-ocean-light)] bg-[var(--wwf-ocean-light)]/30 px-6 py-3.5 text-sm font-bold tracking-widest text-[var(--wwf-gray-100)]/60 uppercase transition-colors group-hover:border-[var(--wwf-ocean)]/50"
+          >
+            Link Coming Soon
+          </button>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  {/* ======================= WEBINAR SERIES ======================= */}
+  <section class="bg-gray-50/50 py-16 md:py-24">
+    <Container>
+      <div class="mx-auto mb-12 max-w-4xl text-center">
+        <h2
+          class="font-wwf text-3xl tracking-wide text-[#003140] uppercase md:text-5xl"
+        >
+          Wild Wisdom Webinar Series
+        </h2>
+        <p class="mt-4 text-base leading-relaxed text-gray-700 md:text-lg">
+          The Wild Wisdom Webinar Series is a set of expert sessions aimed at
+          equipping students with the knowledge and insights needed to gear up
+          for the various rounds of the challenge.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:mx-auto md:max-w-3xl">
+        {
+          webinars.map((webinar) => (
+            <div class="flex flex-col items-center overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg transition-all hover:shadow-xl">
+              {webinar.status === "COMING SOON" ? (
+                <div class="flex aspect-video w-full flex-col items-center justify-center bg-gray-100 text-[#003140]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="mb-3 h-12 w-12 text-[#259cb4] opacity-70"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span class="font-bold tracking-widest text-[#259cb4] uppercase">
+                    Coming Soon
+                  </span>
+                </div>
+              ) : (
+                <video
+                  data-src={`/video/${webinar.src}`}
+                  class="lazy-video aspect-video w-full bg-black object-cover"
+                  controls
+                  preload="none"
+                />
+              )}
+              <div class="flex w-full flex-col justify-center p-6 text-center md:p-8">
+                <span class="mb-2 text-sm font-bold tracking-widest text-[#259cb4] uppercase">
+                  {webinar.session}
+                </span>
+                <h5 class="text-xl font-bold text-[#003140]">
+                  {webinar.speaker}
+                </h5>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </Container>
+  </section>
+
+  {
+    /* NOTE: Bio-Blitz Activity section has been kept hidden/commented out based on previous structure */
+  }
+</MainLayout>
+
+{/* Video Lazy Loading Script */}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const lazyVideos = document.querySelectorAll("video.lazy-video")
+
+    if ("IntersectionObserver" in window) {
+      const videoObserver = new IntersectionObserver(
+        (entries, observer) => {
+          entries.forEach((video) => {
+            if (video.isIntersecting) {
+              const videoElement = video.target as HTMLVideoElement
+              const src = videoElement.getAttribute("data-src")
+              if (src) {
+                videoElement.src = src
+                videoElement.removeAttribute("data-src")
+              }
+              observer.unobserve(videoElement)
+            }
+          })
+        },
+        { rootMargin: "0px 0px 200px 0px" }
+      )
+
+      lazyVideos.forEach((video) => {
+        videoObserver.observe(video)
+      })
+    } else {
+      // Fallback for older browsers
+      lazyVideos.forEach((video) => {
+        const videoElement = video as HTMLVideoElement
+        const src = videoElement.getAttribute("data-src")
+        if (src) {
+          videoElement.src = src
+        }
+      })
+    }
+  })
+</script>

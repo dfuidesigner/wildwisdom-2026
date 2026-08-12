@@ -1,0 +1,14 @@
+---
+import StudentLayout from "@/layouts/StudentLayout.astro"
+import { QuizGuidelines } from "@/components/student/QuizGuidelines"
+---
+
+<StudentLayout title="Rules & Guidelines">
+  <div class="relative overflow-hidden">
+    <div
+      class="absolute -top-40 left-0 -z-10 h-80 w-80 rounded-full bg-emerald-50/50 blur-3xl"
+    >
+    </div>
+    <QuizGuidelines client:only="react" />
+  </div>
+</StudentLayout>

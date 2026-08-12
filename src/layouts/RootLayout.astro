@@ -1,0 +1,41 @@
+---
+import { ToastProvider } from "@/components/providers/ToastProvider"
+import GoogleAnalytics from "@/components/GoogleAnalytics.astro"
+import "@/styles/global.css"
+
+interface Props {
+  title: string
+  description?: string
+  bodyClass?: string
+}
+
+const {
+  title,
+  description = "The ultimate wildlife quiz platform.",
+  bodyClass = "flex min-h-screen flex-col bg-slate-50 font-sans text-slate-900 antialiased",
+} = Astro.props
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href={`${import.meta.env.BASE_URL}favicon.ico`}
+    />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="google-site-verification"
+      content="VQ4JxrhaT8kvFiks1sf8wtDdOv0ItSL_B9CraRc-Y_Q"
+    />
+  </head>
+  <body class={bodyClass}>
+    <slot />
+    <ToastProvider client:load />
+    <GoogleAnalytics />
+  </body>
+</html>

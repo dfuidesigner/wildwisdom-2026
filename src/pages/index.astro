@@ -1,0 +1,680 @@
+---
+import MainLayout from "@/layouts/main.astro"
+import Container from "@/components/common/Container.astro"
+import OceanElement from "@/components/home/OceanElement"
+import AnimatedFish from "@/components/home/AnimatedFish"
+import AnimatedBubbles from "@/components/home/AnimatedBubbles"
+import AnimatedSeaweed from "@/components/home/AnimatedSeaweed"
+import { PartnersCarousel } from "@/components/home/PartnersCarousel"
+import { WinningTeamsCarousels } from "@/components/home/WinningTeamsCarousels"
+import { LevelModal } from "@/components/home/LevelModal"
+import AnimatedBossCrab from "@/components/home/AnimatedBossCrab"
+import AnimatedBossOctopus from "@/components/home/AnimatedOctopus"
+import AnimatedStarfish from "@/components/home/AnimatedStarfish"
+import { RewardsSection } from "@/components/home/RewardsSection"
+import { RegistrationGuidelines } from "@/components/home/RegistrationGuidelines"
+import WorldMap from "@/components/home/WorldMap"
+import AnimatedBlueFish from "@/components/home/AnimatedBlueFish"
+import AnimatedDarkFish from "@/components/home/AnimatedDarkFish"
+
+const baseUrl = import.meta.env.BASE_URL
+
+export type Level = {
+  number: string
+  title: string
+  type: string
+  duration: string
+  extraClasses?: string
+  icon: string
+  modal: {
+    title: string
+    who: string
+    how?: string[]
+    where?: string
+    bonus?: { title: string; desc: string }
+  }
+}
+
+const levelGroups: Level[][] = [
+  [
+    {
+      number: "1",
+      title: "CLASSROOM",
+      type: "VIRTUAL",
+      duration: "Mid August – Mid September",
+      icon: "cls-1.svg",
+      modal: {
+        title: "Classroom Level",
+        who: "All registered students from participating schools (Grades 6-9). A minimum of 50 students per school must participate !",
+        how: [
+          "A series of quizzes will be hosted virtually on the WWGC website.",
+          "Participating students will attempt the quizzes online during the classroom-level phase.",
+          "Scores from each quiz will be recorded and will accumulate over the course of the series.",
+          "Based on the cumulative scores, the top two students from each classroom/school will be shortlisted.",
+          "The top two students will qualify for the next level of the Wild Wisdom Global Challenge.",
+        ],
+        where:
+          "Quizzes will be hosted virtually on the WWGC website (Details will be shared with all registered schools).",
+      },
+    },
+    {
+      number: "2",
+      title: "STATE",
+      type: "VIRTUAL",
+      duration: "Mid September – October",
+      icon: "cls-2.svg",
+      modal: {
+        title: "State Level",
+        who: "Top 2 students from each school qualified from the Classroom Level.",
+        how: [
+          "Qualified students will participate in the State Level round.",
+          "The competition will be conducted online on a digital platform.",
+          "Participants will complete quizzes and/or challenge-based assessments.",
+          "Top-performing participants will advance to the next level.",
+        ],
+        where:
+          "Quizzes will be hosted virtually on the website (Details will be shared with all Qualifying schools).",
+      },
+    },
+  ],
+  [
+    {
+      number: "3",
+      title: "ZONAL",
+      type: "ON-GROUND",
+      duration: "October",
+      icon: "zo.svg",
+      modal: {
+        title: "Zonal Level",
+        who: "Top-performing teams qualified from the State Level.",
+        how: [
+          "Top-winning teams from each state will qualify for the Zonal Level.",
+          "A total of five Zonal Rounds will be conducted across India.",
+          "Qualified teams will compete in their respective zonal rounds through on-ground events.",
+          "Zonal winners will advance to the next level of the Wild Wisdom Global Challenge.",
+        ],
+        where:
+          "Designated venues across regions. The exact venue details will be communicated to all participants via email.",
+      },
+    },
+    {
+      number: "4",
+      title: "NATIONAL",
+      type: "ON-GROUND",
+      duration: "November",
+      icon: "na.svg",
+      modal: {
+        title: "National Level",
+        who: "Zonal winners advance to the National Finale in Delhi, where teams compete for the title of National Champion.",
+        how: [
+          "The top-winning (5) team from each zone will qualify for the National Level.",
+          "The National Level round will be conducted as an on-ground event in Delhi.",
+          "Zonal winners will compete to determine the National Champion of the Wild Wisdom Global Challenge.",
+        ],
+        where:
+          "Delhi (on-ground National Finale event). The exact venue details will be communicated to all participants via email.",
+      },
+    },
+  ],
+  [
+    {
+      number: "5",
+      title: "INTERNATIONAL",
+      type: "VIRTUAL",
+      duration: "December",
+      extraClasses: "md:w-[320px] level-5modal",
+      icon: "in.svg",
+      modal: {
+        title: "International Level",
+        who: "The National Champions represent their country on a global platform, competing with top teams from around the world for the title of Global Champions.",
+        how: [
+          "The National Champion will represent the country at the global level.",
+          "The competition will be conducted on an international virtual platform.",
+          "Teams will compete against top participants from around the world.",
+          "The winner will be crowned the Global Champion.",
+        ],
+        where:
+          "Virtually, on Zoom (Details will be shared with all qualifying schools.)",
+      },
+    },
+  ],
+]
+---
+
+<MainLayout
+  title="The WWGC Voyage Across the Oceans l Wildwisdom 2026"
+  description="The ultimate interactive wildlife quiz platform for schools and students."
+>
+  <section
+    class="relative z-3 flex h-[80vh] w-full flex-col justify-center overflow-hidden sm:h-screen"
+  >
+    <div class="absolute inset-0 z-0 transition-all duration-500">
+      <img
+        src={`${baseUrl}images/hero-banner-new.webp`}
+        alt="Ocean Depths Background"
+        class="h-full w-full max-[1280px]:object-cover"
+        fetchpriority="high"
+      />
+    </div>
+
+    <Container class="relative z-3 my-5">
+      <div class="relative">
+        <img
+          src={`${baseUrl}images/logo.webp`}
+          alt="Wild Wisdom Global Challenge Badge"
+          width="200"
+          height="200"
+          class="relative left-15 -mb-2 h-24 w-auto drop-shadow-xl md:h-28 lg:h-40 xl:h-40 xl:w-40"
+        />
+        <img
+          src={`${baseUrl}images/banner-text.webp`}
+          alt="Wild Wisdom Global Challenge Badge"
+          class="w-full min-[1281px]:w-[60%] md:w-[60%] lg:w-[50%]"
+          width="600"
+          height="400"
+        />
+      </div>
+    </Container>
+    <div class="absolute top-10 right-5 md:right-[12%]">
+      <AnimatedBossCrab client:load />
+    </div>
+    <div
+      class="absolute bottom-[5%] left-5 rotate-y-180 md:right-[20%] md:bottom-[18%]"
+    >
+      <AnimatedBossOctopus client:load />
+    </div>
+    <div
+      class="pointer-events-none absolute right-4 z-99 hidden w-20 opacity-90 max-[992px]:overflow-hidden md:right-[3%] md:bottom-[50%] md:block md:w-48"
+    >
+      <AnimatedStarfish className="h-full w-10" />
+    </div>
+    <img
+      src={`${baseUrl}images/svgs/banner-weed.svg`}
+      alt="Wild Wisdom Global Challenge Badge"
+      class="absolute right-0 bottom-0 z-3 w-20 md:w-30"
+      width="600"
+      height="400"
+    />
+  </section>
+
+  <section class="bg-[#253D70] xl:py-0">
+    <img
+      src={`${baseUrl}images/bg-blue-wave.webp`}
+      alt="Wild Wisdom Global Challenge Badge"
+      width="1300"
+      height="50"
+      class="relative bottom-1 z-3 w-full sm:bottom-2 lg:bottom-3"
+    />
+    <Container class="grid items-center max-sm:gap-5 sm:grid-cols-5">
+      <div class="w-full max-sm:flex max-sm:justify-end">
+        <img
+          src={`${baseUrl}images/svgs/blue-ban1.svg`}
+          alt="Wild Wisdom Global Challenge Badge"
+          width="300"
+          height="300"
+          class="max-h-44.75 max-sm:w-30"
+        />
+      </div>
+      <p
+        class="text-center text-lg font-bold text-white uppercase underline sm:col-span-3 lg:text-2xl xl:text-3xl"
+      >
+        <a href={`${baseUrl}register/school`}>
+          Register your school <span style="color: #FFC4E0;"
+            >today for FREE to <br class="hidden md:block" />earn your spot
+            among the winners!</span
+          >
+        </a>
+      </p>
+      <div>
+        <img
+          src={`${baseUrl}images/svgs/blue-ban2.svg`}
+          alt="Wild Wisdom Global Challenge Badge"
+          width="300"
+          height="300"
+          class="max-h-44.75 max-sm:w-30"
+        />
+      </div>
+    </Container>
+
+    <img
+      src={`${baseUrl}images/bg-blue-wave.webp`}
+      alt="Wild Wisdom Global Challenge Badge"
+      width="1300"
+      height="50"
+      class="relative top-1 z-3 w-full rotate-x-180 sm:top-2 lg:top-3"
+    />
+  </section>
+
+  <section
+    id="about"
+    class="relative overflow-hidden py-20 md:py-28 lg:py-35"
+    style="background: radial-gradient(50% 50% at 50% 50%, #FFBF5E 0%, #F8A630 100%);"
+  >
+    <Container class:list="flex justify-center">
+      <div
+        class="relative z-10 flex w-87.5 flex-col items-center gap-6 px-4 text-center md:w-auto md:gap-10 md:px-0"
+      >
+        <div>
+          <img
+            src={`${baseUrl}images/Mid-ground.webp`}
+            alt="Wild Wisdom Global Challenge Badge"
+            width="52"
+            height="52"
+          />
+        </div>
+        <div class="text-lg md:max-w-3xl md:text-xl lg:max-w-4xl">
+          <p>
+            In the mysterious depths of the ocean, the deeper we go, the more we
+            discover, and the greater impact our actions can have. Take on the
+            ultimate marine challenge to learn more and win big — for your
+            school, and the planet!
+          </p>
+          <p class="mt-5">
+            The Wild Wisdom Global Challenge (WWGC) by WWF-India is a
+            one-of-a-kind learning experience that brings together students from
+            across the world to explore the wonders of nature. Through WWGC’s
+            engaging quizzes, interactive resources, and expert-led sessions,
+            students learn to think deeply, cultivate curiosity, and take
+            meaningful action for the planet. Open to students of Grades 6 to 9,
+            the Challenge goes beyond competition — it is a journey of
+            discovery, awareness and impact.
+          </p>
+        </div>
+        <svg
+          class="w-48"
+          viewBox="0 0 246 15"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M244.21 3.79714C238.22 2.30714 232.66 -0.272862 225.73 0.117138C219.21 0.477138 214.94 4.06714 208.8 4.69714C196.95 5.91714 189.18 -1.58286 177.19 0.307138C173.27 0.927138 169.05 3.87714 164.79 4.48714C153.07 6.14714 145.54 -0.502862 134.44 0.117138C127.92 0.477138 123.65 4.06714 117.51 4.69714C105.33 5.94714 97.82 -1.62286 84.9 0.567138C80.65 1.28714 76.73 4.10714 72.43 4.64714C61.53 6.03714 53.9 -0.492862 43.16 0.117138C34.24 0.617138 29.12 5.76714 18.81 4.69714C12.08 4.01714 6.84 -0.912862 0 0.187138V10.1471C6.84 9.05714 12.08 13.9771 18.81 14.6671C29.12 15.7271 34.24 10.5771 43.16 10.0771C53.9 9.46714 61.53 15.9971 72.44 14.6071C76.74 14.0671 80.66 11.2371 84.91 10.5271C97.83 8.33714 105.34 15.9071 117.52 14.6671C123.66 14.0271 127.93 10.4371 134.45 10.0771C145.55 9.44714 153.08 16.1071 164.8 14.4471C169.06 13.8371 173.28 10.8871 177.2 10.2671C189.19 8.38714 196.96 15.8771 208.81 14.6671C214.95 14.0271 219.22 10.4371 225.74 10.0771C232.98 9.66714 238.73 12.5171 245.04 13.9571C244.65 10.5671 244.38 7.16714 244.22 3.78714L244.21 3.79714Z"
+            fill="#274B85"></path>
+        </svg>
+
+        <div
+          class="relative flex flex-col items-center justify-center mix-blend-overlay lg:-mb-35"
+        >
+          <img
+            src={`${baseUrl}images/svgs/ss-pink.svg`}
+            alt="Wild Wisdom Global Challenge Badge"
+            width="300"
+            height="300"
+            class="w-[95%] sm:w-[50%] lg:w-[70%]"
+          />
+
+          <div
+            class="static flex items-center justify-center rounded-2xl bg-[#f58323] py-4 lg:absolute lg:bottom-10 lg:mt-0 lg:rounded-none lg:bg-transparent lg:py-0"
+          >
+            <p
+              class="px-6 text-center text-lg font-bold text-[#013D87] md:text-xl"
+            >
+              In 2026, we dive into the oceans — a world <br
+                class="hidden sm:block"
+              /> teeming with mystery, movement, and life.
+            </p>
+          </div>
+        </div>
+      </div>
+    </Container>
+
+    <OceanElement
+      client:visible
+      src={`${baseUrl}images/svgs/orange-stick.svg`}
+      type="float"
+      delay={0.2}
+      className="absolute top-10 left-0 w-12 opacity-70 sm:w-20 md:top-15 md:w-30 md:opacity-100 lg:w-30"
+    />
+    <OceanElement
+      client:visible
+      src={`${baseUrl}images/svgs/dark-blue-coral.svg`}
+      type="coral"
+      delay={0.5}
+      className="absolute -bottom-16 -left-5 w-25 md:-bottom-25 md:left-5 md:w-40 lg:-bottom-35 lg:left-0 lg:w-auto"
+    />
+    <OceanElement
+      client:visible
+      src={`${baseUrl}images/blue-fish.webp`}
+      type="fish"
+      delay={0}
+      className="absolute top-10 left-20 z-0 w-18 sm:left-[40%] md:left-[30%] md:w-25 lg:left-[10%] lg:w-40 xl:top-[40%] xl:left-[3%] xl:w-35"
+    />
+    <OceanElement
+      client:visible
+      src={`${baseUrl}images/gold-fish.webp`}
+      type="fish"
+      delay={1.5}
+      className="absolute top-10 right-4 z-0 w-16 sm:right-[13%] md:top-10 md:right-[8%] md:w-24 lg:right-[15%] lg:w-30 xl:right-[15%]"
+    />
+    <OceanElement
+      client:visible
+      src={`${baseUrl}images/svgs/dark-cora-right.svg`}
+      type="coral"
+      delay={0.8}
+      className="absolute right-0 bottom-0 w-10 opacity-80 sm:w-15 md:w-20 md:opacity-100 lg:w-auto"
+    />
+    <OceanElement
+      client:visible
+      src={`${baseUrl}images/pink-coral.webp`}
+      type="coral"
+      delay={1.2}
+      className="absolute -right-5 -bottom-10 w-28 md:right-5 md:-bottom-15 md:w-50 lg:-bottom-20 lg:w-auto"
+    />
+    <OceanElement
+      client:visible
+      src={`${baseUrl}images/pink-weed.webp`}
+      type="coral"
+      delay={1.2}
+      className="absolute bottom-[20%] w-15 max-[769px]:rotate-y-180! md:top-40 md:right-0 md:w-20"
+    />
+  </section>
+
+  <section
+    class="relative bottom-1.5 z-10 -mb-1.5 h-screen md:h-[90vh] xl:h-auto"
+  >
+    <img
+      src={`${baseUrl}images/section-bg-3.webp`}
+      alt="Ocean Depths Background"
+      class="h-full w-full object-cover object-right"
+    />
+    <Container
+      class="absolute top-20 left-1/2 z-20 -translate-x-1/2 text-center"
+    >
+      <div class="flex flex-col items-center justify-center gap-5">
+        <div class="font-semibold text-white uppercase">
+          <p class="text-lg font-bold text-[#FB81A7] md:text-2xl lg:text-4xl">
+            THE THEME:
+          </p>
+          <h2 class="text-2xl md:text-2xl">
+            From the Coastline To the Seafloor
+          </h2>
+        </div>
+        <img
+          src={`${baseUrl}images/section-text.webp`}
+          alt="Ocean Depths Background"
+          class="w-[60%]"
+        />
+        <div class="flex flex-col gap-10 text-white md:max-w-2xl">
+          <p>
+            From glowing jellyfish drifting through the dark to deep-sea
+            creatures that survive under crushing pressure — life beneath the
+            waves is full of surprises! These marine species play a far greater
+            role in our lives than we often realize. Did you know that tiny
+            ocean plankton produce much of the oxygen we breathe?
+          </p>
+          <div>
+            <a
+              href={`${baseUrl}pdf/THEMEDOC2.pdf`}
+              class="blue-btn"
+              target="_blank"
+            >
+              Read More
+            </a>
+            <p class="mt-7 italic">
+              about this fascinating world beneath the waves!
+            </p>
+          </div>
+        </div>
+      </div>
+    </Container>
+
+    <div class="pointer-events-none absolute bottom-0 left-0 z-10 w-full">
+      <svg
+        class="h-50 w-full md:h-100"
+        viewBox="0 0 1920 400"
+        preserveAspectRatio="none"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M0 0H1920V400H0V0Z" fill="url(#smooth_fade)"></path>
+        <defs>
+          <linearGradient
+            id="smooth_fade"
+            x1="0"
+            y1="400"
+            x2="0"
+            y2="0"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stop-color="#003140"></stop>
+            <stop offset="0.4" stop-color="#003140" stop-opacity="0.6"></stop>
+            <stop offset="1" stop-color="#003140" stop-opacity="0"></stop>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  </section>
+
+  <div class="relative">
+    <div class="absolute inset-0">
+      <img
+        src={`${baseUrl}images/bbg-test.webp`}
+        alt="Wild Wisdom Global Challenge Badge"
+        width="1200"
+        height="1200"
+        class="h-full w-full max-[992px]:object-cover"
+      />
+    </div>
+
+    <section class="bg-ocean-deep py-20">
+      <Container class="relative">
+        <div
+          class="mb-20 flex flex-col items-center justify-center text-center"
+        >
+          <h2 class="font-wwf text-5xl tracking-wide text-white uppercase">
+            The WWGC Voyage Across the Oceans
+          </h2>
+          <img
+            src={`${baseUrl}images/svgs/yellow-bar.svg`}
+            alt="Ocean Depths Background"
+            class="mt-1 w-20"
+          />
+          <p class="mt-5 text-white">
+            The Wild Wisdom Global Challenge included participants from 57
+            countries globally! Schools & <br class="hidden md:block" />Children
+            from over 57+ Global locations have taken the challenge in the past.
+          </p>
+        </div>
+        <WorldMap client:visible />
+      </Container>
+
+      <div class="absolute top-[18%] right-0">
+        <AnimatedDarkFish client:visible />
+      </div>
+      <OceanElement
+        client:visible
+        src={`${baseUrl}images/capa.webp`}
+        type="fish"
+        delay={1.5}
+        className="absolute top-10 left-5 z-5 w-16 md:-top-20 md:w-24 lg:top-30 lg:left-0 lg:w-30 xl:top-[15%] xl:left-[7%]"
+      />
+    </section>
+
+    <section class="relative">
+      <Container class="relative z-10 flex justify-center">
+        <OceanElement
+          client:visible
+          src={`${baseUrl}images/gold-fish.webp`}
+          type="fish"
+          delay={1.5}
+          className="absolute top-10 left-5 z-5 w-16 md:-top-20 md:w-24 lg:top-30 lg:left-0 lg:w-30 xl:top-10 xl:left-[10%]"
+        />
+        <OceanElement
+          client:visible
+          src={`${baseUrl}images/gold-fish-1.webp`}
+          type="float"
+          delay={1.5}
+          className="absolute top-10 right-4 z-0 w-16 sm:left-[13%] md:top-50 md:left-[8%] md:w-24 lg:top-30 lg:left-[15%] lg:w-30 xl:left-[20%]"
+        />
+
+        <div class="max-w-7xl max-[992px]:w-full">
+          <div
+            class="pb-cu relative w-full rounded-[58px] border-4 border-[#95DDEA] p-10 shadow-[0_0_20px_rgba(90,223,255,0.3)] lg:h-225 lg:w-225"
+          >
+            <div class="mb-16 flex flex-col items-center gap-5 text-center">
+              <h2
+                class="mb-3 font-wwf text-4xl tracking-wider text-white md:text-[54px]"
+              >
+                LEVELS OF THE CHALLENGE
+              </h2>
+
+              <div class="mb-5 flex justify-center">
+                <svg
+                  width="246"
+                  height="15"
+                  viewBox="0 0 246 15"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M244.21 3.79714C238.22 2.30714 232.66 -0.272862 225.73 0.117138C219.21 0.477138 214.94 4.06714 208.8 4.69714C196.95 5.91714 189.18 -1.58286 177.19 0.307138C173.27 0.927138 169.05 3.87714 164.79 4.48714C153.07 6.14714 145.54 -0.502862 134.44 0.117138C127.92 0.477138 123.65 4.06714 117.51 4.69714C105.33 5.94714 97.82 -1.62286 84.9 0.567138C80.65 1.28714 76.73 4.10714 72.43 4.64714C61.53 6.03714 53.9 -0.492862 43.16 0.117138C34.24 0.617138 29.12 5.76714 18.81 4.69714C12.08 4.01714 6.84 -0.912862 0 0.187138V10.1471C6.84 9.05714 12.08 13.9771 18.81 14.6671C29.12 15.7271 34.24 10.5771 43.16 10.0771C53.9 9.46714 61.53 15.9971 72.44 14.6071C76.74 14.0671 80.66 11.2371 84.91 10.5271C97.83 8.33714 105.34 15.9071 117.52 14.6671C123.66 14.0271 127.93 10.4371 134.45 10.0771C145.55 9.44714 153.08 16.1071 164.8 14.4471C169.06 13.8371 173.28 10.8871 177.2 10.2671C189.19 8.38714 196.96 15.8771 208.81 14.6671C214.95 14.0271 219.22 10.4371 225.74 10.0771C232.98 9.66714 238.73 12.5171 245.04 13.9571C244.65 10.5671 244.38 7.16714 244.22 3.78714L244.21 3.79714Z"
+                    fill="#F78623"></path>
+                </svg>
+              </div>
+              <!-- <h3
+                class="font-wwf text-sm tracking-[0.2em] text-white [text-shadow:0_0_4px_#95DDEA,0_0_12px_#95DDEA,0_0_24px_rgba(149,221,234,0.6)] md:text-2xl"
+              >
+                GEAR UP PHASE
+              </h3> -->
+            </div>
+
+            <div
+              class=":gap-14 mx-auto flex w-full flex-col items-center gap-6 sm:gap-12"
+            >
+              {
+                levelGroups.map((group, index) => (
+                  <div
+                    class={
+                      index === 2
+                        ? "mt-2 flex w-full justify-center"
+                        : "flex w-full flex-col justify-center gap-6 min-[561px]:flex-row md:gap-12 xl:gap-40"
+                    }
+                  >
+                    {group.map((level) => (
+                      <LevelModal
+                        client:visible
+                        level={level}
+                        baseUrl={baseUrl}
+                      />
+                    ))}
+                  </div>
+                ))
+              }
+            </div>
+            <div
+              class="pointer-events-none absolute -bottom-16 left-1/2 z-20 w-full max-w-200 -translate-x-1/2 md:-bottom-28"
+            >
+              <div class="relative flex w-full justify-center">
+                <div
+                  class="absolute h-48 w-15 max-[480px]:top-[-60%] max-[480px]:left-[10%] sm:top-[10%] sm:left-[15%] md:top-[-20%] lg:left-[15%]"
+                >
+                  <AnimatedBubbles client:visible />
+                </div>
+
+                <img
+                  src={`${baseUrl}images/Orca.webp`}
+                  alt="Ocean Depths Background"
+                  class="z-8 w-[80%] object-contain md:w-[60%]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </Container>
+      <AnimatedSeaweed client:visible />
+      <AnimatedFish client:visible />
+    </section>
+
+    <section class="relative mt-30 overflow-x-hidden sm:mt-40">
+      <Container class="flex justify-center">
+        <div
+          class="flex flex-col items-center justify-center min-[1300px]:gap-10 md:gap-5"
+        >
+          <h2 class="text-orange mb-5 text-center font-wwf text-6xl uppercase">
+            Rewards
+          </h2>
+
+          <RewardsSection baseUrl={baseUrl} client:visible />
+          <RegistrationGuidelines baseUrl={baseUrl} client:visible />
+        </div>
+      </Container>
+      <div class="absolute right-0 bottom-0 w-30 sm:bottom-40">
+        <AnimatedBlueFish client:visible />
+      </div>
+
+      <OceanElement
+        client:visible
+        src={`${baseUrl}images/two-fish.webp`}
+        type="fish"
+        delay={0.2}
+        className="absolute right-0 bottom-10 w-12 opacity-70 sm:w-20 md:bottom-0 md:w-30 md:opacity-100 lg:w-30 xl:right-30"
+      />
+      <img
+        src={`${baseUrl}images/svgs/red-coral.svg`}
+        alt="Ocean Depths Background"
+        class="absolute right-0 bottom-[40%] hidden w-20 lg:block"
+      />
+    </section>
+    <section
+      class="relative z-10 flex w-full items-end pb-8 max-[1281px]:pt-12 max-[1281px]:pb-0 min-[1281px]:pt-105 2xl:pt-30"
+    >
+      <Container
+        class="relative z-10 flex h-max flex-col items-center justify-center text-center"
+      >
+        <h2
+          id="supporters"
+          class="font-wwf text-4xl tracking-wide text-[#F8A632] uppercase drop-shadow-md md:text-5xl"
+        >
+          Our Valued Partners and Sponsors
+        </h2>
+
+        <p
+          class="mt-4 max-w-3xl text-sm leading-relaxed text-white md:text-base"
+        >
+          The Wild Wisdom Global Challenge thanks our partners and supporters
+          who share our commitment to environmental education and conservation.
+        </p>
+
+        <div class="mb-12 w-full">
+          <PartnersCarousel baseUrl={baseUrl} client:visible />
+        </div>
+      </Container>
+      <div class="absolute bottom-0 left-0 w-30 sm:bottom-50">
+        <AnimatedBlueFish client:visible />
+      </div>
+
+      <OceanElement
+        client:visible
+        src={`${baseUrl}images/purple-fish.webp`}
+        type="fish"
+        delay={0.2}
+        className="absolute top-[-5%] left-0 w-12 opacity-70 min-[1281px]:top-0! sm:w-20 md:w-30 md:opacity-100 lg:top-[-50%] lg:w-30 xl:left-10"
+      />
+    </section>
+  </div>
+
+  <section class="next-footer relative w-full">
+    <img
+      src={`${baseUrl}images/last-bg.webp`}
+      alt="Ocean Depths Background"
+      class="hidden h-auto w-full lg:block"
+    />
+
+    <div class="absolute inset-0 block lg:hidden">
+      <img
+        src={`${baseUrl}images/last-bg.webp`}
+        alt="Ocean Depths Background"
+        class="h-full w-full object-cover"
+      />
+    </div>
+    <Container class="inset-0 w-full max-w-6xl lg:absolute">
+      <WinningTeamsCarousels client:visible />
+    </Container>
+
+    <img
+      src={`${baseUrl}images/jelly-fish.webp`}
+      alt="Ocean Depths Background"
+      class="absolute right-0 bottom-[22%] hidden max-[1290px]:bottom-[15%] lg:block"
+      width="500"
+    />
+  </section>
+</MainLayout>

@@ -1,0 +1,174 @@
+---
+import MainLayout from "@/layouts/main.astro"
+import { FaqAccordion } from "@/components/faq/FaqAccordion"
+import { MessageCircleQuestion } from "lucide-react"
+import Container from "@/components/common/Container.astro"
+
+const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "")
+---
+
+<MainLayout title="Frequently Asked Questions | Wild Wisdom 2026">
+  <div class="flex min-h-screen flex-col bg-(--wwf-ocean-deep)/60">
+    <div
+      class="relative flex flex-col items-center justify-center overflow-hidden px-6 py-20 text-center md:py-28"
+    >
+      <div
+        class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-overlay"
+        style={`background-image: url('${baseUrl}/images/hero-banner.webp');`}
+      >
+      </div>
+      <div
+        class="absolute inset-0 bg-linear-to-b from-transparent to-(--wwf-ocean-deep)/90 opacity-100"
+      >
+      </div>
+      <div class="absolute inset-0 bg-(--wwf-ocean-deep)/30 mix-blend-multiply">
+      </div>
+
+      <div
+        class="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center gap-5"
+      >
+        <div
+          class="mb-2 flex items-center justify-center gap-2 text-(--wwf-sea-green)"
+        >
+          <MessageCircleQuestion
+            size={24}
+            className="fill-(--wwf-sea-green)/20"
+          />
+          <span
+            class="text-sm font-black tracking-[0.3em] uppercase drop-shadow-sm"
+          >
+            Need Help?
+          </span>
+        </div>
+
+        <h1
+          class="font-wwf text-5xl leading-tight font-thin tracking-wide text-white drop-shadow-lg sm:text-6xl md:text-7xl"
+        >
+          Frequently Asked <span class="text-(--wwf-coral)">Questions</span>
+        </h1>
+
+        <div class="my-2 flex justify-center">
+          <svg
+            width="246"
+            height="15"
+            viewBox="0 0 246 15"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            class="opacity-80"
+          >
+            <path
+              d="M244.21 3.79714C238.22 2.30714 232.66 -0.272862 225.73 0.117138C219.21 0.477138 214.94 4.06714 208.8 4.69714C196.95 5.91714 189.18 -1.58286 177.19 0.307138C173.27 0.927138 169.05 3.87714 164.79 4.48714C153.07 6.14714 145.54 -0.502862 134.44 0.117138C127.92 0.477138 123.65 4.06714 117.51 4.69714C105.33 5.94714 97.82 -1.62286 84.9 0.567138C80.65 1.28714 76.73 4.10714 72.43 4.64714C61.53 6.03714 53.9 -0.492862 43.16 0.117138C34.24 0.617138 29.12 5.76714 18.81 4.69714C12.08 4.01714 6.84 -0.912862 0 0.187138V10.1471C6.84 9.05714 12.08 13.9771 18.81 14.6671C29.12 15.7271 34.24 10.5771 43.16 10.0771C53.9 9.46714 61.53 15.9971 72.44 14.6071C76.74 14.0671 80.66 11.2371 84.91 10.5271C97.83 8.33714 105.34 15.9071 117.52 14.6671C123.66 14.0271 127.93 10.4371 134.45 10.0771C145.55 9.44714 153.08 16.1071 164.8 14.4471C169.06 13.8371 173.28 10.8871 177.2 10.2671C189.19 8.38714 196.96 15.8771 208.81 14.6671C214.95 14.0271 219.22 10.4371 225.74 10.0771C232.98 9.66714 238.73 12.5171 245.04 13.9571C244.65 10.5671 244.38 7.16714 244.22 3.78714L244.21 3.79714Z"
+              fill="#F78623"></path>
+          </svg>
+        </div>
+
+        <p
+          class="mx-auto max-w-2xl text-lg leading-relaxed font-medium text-(--wwf-sea-green) drop-shadow-md"
+        >
+          Everything you need to know about the Wild Wisdom Global Challenge
+          2026. From registration to the international finale, we've got you
+          covered.
+        </p>
+      </div>
+    </div>
+    <div
+      class="relative w-full overflow-hidden bg-(--wwf-white) pt-16 pb-20 shadow-[0_-10px_40px_rgba(0,0,0,0.15)]"
+    >
+      <div class="pointer-events-none absolute inset-0 z-0">
+        <img
+          src={`${baseUrl}/images/jelly-fish.webp`}
+          alt=""
+          class="float-slow absolute top-0 -right-20 w-64 opacity-20 md:right-0 md:w-80 xl:right-10"
+        />
+
+        <img
+          src={`${baseUrl}/images/blue-fish.webp`}
+          alt=""
+          class="float-delayed absolute top-1/3 -left-10 w-32 opacity-[0.15] md:left-5 md:w-48 xl:left-16"
+        />
+
+        <img
+          src={`${baseUrl}/images/gold-fish.webp`}
+          alt=""
+          class="float-fast absolute top-2/3 -right-8 w-20 -scale-x-100 transform opacity-30 md:right-12 md:w-28"
+        />
+
+        <img
+          src={`${baseUrl}/images/svgs/red-coral.svg`}
+          alt=""
+          class="absolute -right-10 -bottom-5 w-48 opacity-40 md:w-40"
+        />
+      </div>
+
+      <Container class="relative z-10 flex flex-col items-center">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
+          <FaqAccordion client:load />
+
+          <div
+            class="mx-auto mt-24 max-w-3xl rounded-3xl border border-(--wwf-border)/30 bg-white/70 p-10 text-center shadow-sm backdrop-blur-md"
+          >
+            <h3 class="font-wwf text-3xl text-(--wwf-ocean-deep)">
+              Still have questions?
+            </h3>
+            <p class="mt-2 mb-8 font-medium text-slate-600">
+              If you couldn't find the answer you were looking for, our team is
+              here to help.
+            </p>
+
+            <a
+              href="mailto:wildwisdom@wwfindia.net"
+              class="group relative inline-flex items-center overflow-hidden rounded-full border border-solid border-black bg-(--wwf-orange) px-8 py-3 font-wwf text-xl tracking-wide text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-(--wwf-coral) hover:shadow-xl active:scale-95"
+            >
+              <div class="absolute inset-0 flex justify-center">
+                <div
+                  class="animate-shimmer h-full w-1/4 -skew-x-12 bg-linear-to-r from-transparent via-white/40 to-transparent"
+                >
+                </div>
+              </div>
+              <span class="wwf-span-font relative z-10">CONTACT SUPPORT</span>
+            </a>
+          </div>
+        </div>
+      </Container>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .float-slow {
+    animation: float 6s ease-in-out infinite;
+  }
+  .float-delayed {
+    animation: float 7s ease-in-out 2s infinite;
+  }
+  .float-fast {
+    animation: float 5s ease-in-out 1s infinite;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-200%);
+    }
+    70% {
+      transform: translateX(200%);
+    }
+    100% {
+      transform: translateX(200%);
+    }
+  }
+  .animate-shimmer {
+    animation: shimmer 3s infinite;
+  }
+</style>
