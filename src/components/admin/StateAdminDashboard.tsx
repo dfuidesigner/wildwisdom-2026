@@ -10,7 +10,10 @@ import {
   MapPin,
   Search,
   Calendar,
+  Mail,
+  Loader2,
 } from "lucide-react"
+import { useMutation } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 import type { ReactNode } from "react"
@@ -43,7 +46,7 @@ interface StateDashboardData {
   state_name: string
   stats: {
     total_schools: number
-    total_students: number 
+    total_students: number
   }
   schools: StateSchool[]
 }
@@ -71,17 +74,30 @@ function StateDashboardContent() {
     },
   })
 
+  const resendEmailMutation = useMutation({
+    mutationFn: async (schoolId: number) => {
+      await api.post(
+        `/state-admin/${PLATFORM_SLUG}/schools/${schoolId}/resend-email`
+      )
+    },
+    onSuccess: () => toast.success("Registration email resent"),
+    onError: () =>
+      toast.error("Couldn't resend the email", {
+        description: "Please try again.",
+      }),
+  })
+
   const availableStates = useMemo(() => {
     if (!data?.state_name) return []
     return data.state_name.split(",").map((s) => s.trim())
   }, [data])
 
   const totalExpectedStudents = useMemo(() => {
-    if (!data?.schools) return 0;
+    if (!data?.schools) return 0
     return data.schools.reduce((sum, school) => {
-      return sum + (Number(school.school_expected_students) || 0);
-    }, 0);
-  }, [data]); 
+      return sum + (Number(school.school_expected_students) || 0)
+    }, 0)
+  }, [data])
 
   const filteredSchools = useMemo(() => {
     if (!data?.schools) return []
@@ -122,7 +138,7 @@ function StateDashboardContent() {
       "Teacher Name",
       "Teacher Email",
       "Teacher Mobile",
-      "Registered Students", 
+      "Registered Students",
     ]
 
     const rows = filteredSchools.map((s) => [
@@ -216,7 +232,7 @@ function StateDashboardContent() {
         />
         <StatCard
           title="Participating Students"
-          count={totalExpectedStudents} 
+          count={totalExpectedStudents}
           icon={<Users size={24} />}
           loading={isLoading}
           colorClass="text-(--wwf-ocean-deep) bg-(--wwf-sea-green)/15"
@@ -280,7 +296,7 @@ function StateDashboardContent() {
                 placeholder="Search name or code..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-10 w-full rounded-lg border border-slate-200 pr-4 pl-9 text-sm focus:border-(--wwf-ocean) focus:ring-1 focus:ring-(--wwf-ocean) focus:outline-none"
+                className="h-10 w-full text-black rounded-lg border border-slate-200 pr-4 pl-9 text-sm focus:border-(--wwf-ocean) focus:ring-1 focus:ring-(--wwf-ocean) focus:outline-none"
               />
             </div>
 
@@ -328,19 +344,20 @@ function StateDashboardContent() {
                 <th className="p-4">Teacher Name</th>
                 <th className="p-4">Teacher Email</th>
                 <th className="p-4">Teacher Mobile</th>
-                <th className="p-4 text-center">Registered Students</th>{" "}
+                <th className="p-4 text-center">Registered Students</th>
+                <th className="p-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-(--wwf-ocean-light)/10 whitespace-nowrap">
               {isLoading ? (
                 <tr>
-                  <td colSpan={18} className="p-8 text-center text-slate-400">
+                  <td colSpan={19} className="p-8 text-center text-slate-400">
                     Loading data...
                   </td>
                 </tr>
               ) : filteredSchools.length === 0 ? (
                 <tr>
-                  <td colSpan={18} className="p-12 text-center text-slate-500">
+                  <td colSpan={19} className="p-12 text-center text-slate-500">
                     <MapPin className="mx-auto mb-3 h-8 w-8 text-slate-300" />
                     <p className="text-lg font-bold text-(--wwf-ocean-deep)">
                       No schools found
@@ -418,6 +435,25 @@ function StateDashboardContent() {
                     </td>
                     <td className="p-4 text-center text-slate-600">
                       {school.school_expected_students}
+                    </td>
+                    <td className="p-4 text-center">
+                      <button
+                        onClick={() => resendEmailMutation.mutate(school.id)}
+                        disabled={
+                          resendEmailMutation.isPending &&
+                          resendEmailMutation.variables === school.id
+                        }
+                        title="Resend registration email"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-(--wwf-ocean-light)/20 bg-white px-3 py-1.5 text-xs font-bold text-(--wwf-ocean-deep) shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50"
+                      >
+                        {resendEmailMutation.isPending &&
+                        resendEmailMutation.variables === school.id ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Mail size={14} />
+                        )}
+                        Resend Email
+                      </button>
                     </td>
                   </tr>
                 ))

@@ -70,6 +70,40 @@ export function QuizGuidelines() {
           </a>
         </div>
 
+        {/* Round Overview */}
+        <div className="-mt-6 space-y-3 text-sm leading-relaxed text-slate-600 md:text-base">
+          <p>
+            The Classroom Challenge is the opening round of the Wild Wisdom
+            Global Challenge, conducted entirely online for the WWGC registered
+            schools via the quiz platform.
+          </p>
+          <p>
+            Every registered student takes part in a series of{" "}
+            <strong>four online quiz levels</strong>, attempting each one in
+            turn. Scores from all four quizzes are added up to calculate a
+            cumulative total for each student.
+          </p>
+          <p>
+            At the end of the round, the{" "}
+            <strong>top two scorers from every participating school</strong>{" "}
+            advance to the next stage — the <strong>State Level Round</strong>.
+          </p>
+          <p>
+            Since the entire challenge runs online, students can log in and
+            complete their quizzes right from their classroom or school portal
+            or at home, with no separate registration needed beyond being an
+            already-registered participant.
+          </p>
+          <p>
+            It is mandatory for students to complete{" "}
+            <strong>all four quiz rounds</strong> to be eligible for the{" "}
+            <strong>State Level Round</strong>. Skipping{" "}
+            <strong>any round</strong> will result in{" "}
+            <strong>disqualification</strong>, regardless of the scores achieved
+            in the completed rounds.
+          </p>
+        </div>
+
         {/* Instructions Modules (Format, Ranking, Metrics) */}
         <div className="space-y-6">
           <div className="flex items-center gap-3">
@@ -107,9 +141,16 @@ export function QuizGuidelines() {
                       className="mt-0.5 shrink-0 text-(--wwf-ocean-deep)"
                     />
                     <span>
-                      Each quiz round will include 10 questions, with 10 points
+                      Each quiz round will include 15 questions, with 15 points
                       awarded for every correct answer.
                     </span>
+                  </li>
+                  <li className="flex gap-2">
+                    <Check
+                      size={16}
+                      className="mt-0.5 shrink-0 text-(--wwf-ocean-deep)"
+                    />
+                    <span>Time to complete each quiz round is 8 minutes.</span>
                   </li>
                 </ul>
               </div>
@@ -175,9 +216,8 @@ export function QuizGuidelines() {
                     />
                     <p>
                       It is mandatory for students to complete{" "}
-                      <strong>all four quiz rounds</strong>
-                      to be eligible for the <strong>State Level Round</strong>.
-                      Skipping
+                      <strong>all four quiz rounds</strong> to be eligible for
+                      the <strong>State Level Round</strong>. Skipping
                       <strong> any round</strong> will result in
                       <strong> disqualification</strong>, regardless of the
                       scores achieved in the completed rounds.
@@ -188,10 +228,27 @@ export function QuizGuidelines() {
                       size={16}
                       className="mt-0.5 shrink-0 text-(--wwf-orange)"
                     />
-                    <span>
-                      Students are advised to download their participation
-                      certificate after successfully completing each quiz round.
-                    </span>
+                    <p>
+                      <strong>Eligibility Note:</strong> It is mandatory for a
+                      school to have{" "}
+                      <strong>at least two participating students</strong> to be
+                      eligible for the State Level Round. If only one student
+                      from a school takes part, that school will{" "}
+                      <strong>not qualify</strong> for the next round.
+                    </p>
+                  </li>
+                  <li className="flex gap-2">
+                    <Check
+                      size={16}
+                      className="mt-0.5 shrink-0 text-(--wwf-orange)"
+                    />
+                    <p>
+                      <strong>Tie-Breaker Rule:</strong> In case two or more
+                      students have the same cumulative score, the student with
+                      the <strong>lesser cumulative time taken</strong> across
+                      the four quizzes will be given preference in the
+                      selection.
+                    </p>
                   </li>
                 </ul>
               </div>
@@ -225,50 +282,62 @@ export function QuizGuidelines() {
             <div className="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4">
               <ClipboardList size={26} className="text-(--wwf-ocean-deep)" />
               <h3 className="text-xl font-bold text-(--wwf-ocean-deep) md:text-2xl">
-                Steps to Take the WWGC Classroom Challenge
+                WWGC Quiz Portal – Student Registration &amp; Quiz Instructions
               </h3>
             </div>
-            <p className="mb-8 text-sm text-slate-500">
-              Follow these steps to register and begin your quiz journey on the
-              WWF-India WWGC portal.
-            </p>
 
             <div className="relative ml-4 space-y-6 pl-6">
               {[
                 {
                   step: "1",
-                  title: "Visit the WWGC Quiz Portal",
-                  desc: "Go to the official WWGC website and click on Sign Up on the home screen.",
+                  title: "Visit the Quiz Platform",
+                  desc: "Open the quiz platform link provided by your teacher coordinator.",
                 },
                 {
                   step: "2",
-                  title: "Register Using Your Email Address",
-                  desc: "Enter your personal email address and complete the verification process by clicking on the activation link sent to your inbox.",
+                  title: "Sign Up / Register",
+                  desc: "Click \u201cSign Up\u201d on the home screen and enter the required details:",
+                  list: [
+                    "Unique School Code",
+                    "Email ID",
+                    "Mobile Number",
+                    "Class",
+                    "Section",
+                  ],
+                  note: "Get your School Code from your teacher or school coordinator. Entering the correct code ensures that your participation and scores are linked to your school.",
                 },
                 {
                   step: "3",
-                  title: "Enter Your School’s Unique Code",
-                  desc: "Obtain the school code from your teacher or school coordinator and enter it in the School Code field. This ensures your participation and scores are linked to your school.",
+                  title: "Verify Your Email",
+                  desc: "An OTP will be sent to your authentic mobile number. Enter the OTP to complete the registration and verification process.",
                 },
                 {
                   step: "4",
                   title: "Log In to Your Dashboard",
-                  desc: "Once your account is verified, log in to access your student dashboard, where you can view assigned quizzes, score history, and quiz schedules.",
+                  desc: "Once your account is verified, log in to your student dashboard. You can view:",
+                  list: ["Assigned quizzes", "Score history", "Quiz schedules"],
                 },
                 {
                   step: "5",
-                  title: "Click “Play Now” to Begin",
-                  desc: "Select the quiz round and click Play Now on your dashboard. Please note that the timer will begin immediately once the quiz starts.",
+                  title: "Click \u201cPlay Now\u201d to Begin",
+                  desc: "Select the required quiz round and click \u201cPlay Now.\u201d",
+                  note: "Important: The timer starts immediately when the quiz begins.",
                 },
                 {
                   step: "6",
                   title: "Answer the Questions Carefully",
-                  desc: "Read each question thoroughly before selecting your answer. Click Next to move to the following question.",
+                  desc: "Read each question carefully and select the correct answer. Click \u201cNext\u201d to move to the next question.",
                 },
                 {
                   step: "7",
                   title: "Submit Your Quiz",
-                  desc: "After answering all questions, click Submit Quiz to complete the round. Once submitted, answers cannot be changed or revisited.",
+                  desc: "After answering all the questions, click \u201cSubmit Quiz.\u201d",
+                  note: "Once the quiz is submitted, your answers cannot be changed or revisited.",
+                },
+                {
+                  step: "8",
+                  title: "Complete All Four Quizzes",
+                  desc: "You must complete all 4 quizzes to become eligible for the next round.",
                 },
               ].map((item, idx) => (
                 <div key={idx} className="relative">
@@ -281,6 +350,24 @@ export function QuizGuidelines() {
                   <p className="mt-1 text-sm leading-relaxed text-slate-600">
                     {item.desc}
                   </p>
+                  {item.list && (
+                    <ul className="mt-2 space-y-1 pl-1">
+                      {item.list.map((li, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2 text-sm leading-relaxed text-slate-600"
+                        >
+                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-(--wwf-ocean-light)" />
+                          {li}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {item.note && (
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                      {item.note}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
@@ -335,15 +422,18 @@ export function QuizGuidelines() {
                 <p>
                   Switching tabs, minimizing the browser window, or navigating
                   away from the quiz page may result in the quiz being
-                  automatically submitted.
+                  automatically submitted, and your one attempt will be
+                  considered complete.
                 </p>
                 <p>
-                  In such cases, the quiz session may restart with a completely
-                  new set of questions and the timer will reset.
+                  Students will not be given a second attempt for the same quiz
+                  under any circumstances. Each quiz level must be completed in
+                  a single attempt.
                 </p>
                 <p className="border-t border-amber-300 pt-2 font-bold text-(--wwf-ocean-deep)">
                   Students are strongly advised to remain on the quiz page
-                  throughout the session to ensure a smooth experience.
+                  throughout the session to ensure a smooth and uninterrupted
+                  experience.
                 </p>
               </div>
             </div>

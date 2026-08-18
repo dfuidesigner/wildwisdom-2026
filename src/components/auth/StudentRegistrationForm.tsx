@@ -179,14 +179,14 @@ function StudentRegistrationFormComponent() {
   }, [phoneNumberTaken, setError])
 
   useEffect(() => {
-    if (resendSeconds <= 0) return
+    if (resendSeconds <= 0 || otpVerified) return
 
     const timer = setTimeout(() => {
       setResendSeconds((value) => value - 1)
     }, 1000)
 
     return () => clearTimeout(timer)
-  }, [resendSeconds])
+  }, [resendSeconds, otpVerified])
 
   const currentSchoolCode = useWatch({
     control,
@@ -566,7 +566,7 @@ function StudentRegistrationFormComponent() {
               </button>
             </div>
 
-            {otpSent && (
+            {otpSent && !otpVerified && (
               <button
                 type="button"
                 onClick={handleSendOtp}

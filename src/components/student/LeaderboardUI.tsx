@@ -52,6 +52,7 @@ interface LeaderboardEntry {
 interface MyRank {
   total_score: number
   school_rank: number
+  total_time_taken?: number
   date?: string
 }
 
@@ -193,14 +194,15 @@ function LeaderboardContent() {
 
               <div>
                 <h3 className="font-wwf text-3xl tracking-widest text-white">
-                  LEVEL CLEARED!
+                  CONGRATULATIONS!
                 </h3>
                 <p className="text-base font-medium text-[#95DDEA]">
-                  You earned{" "}
-                  <span className="font-black text-white">
-                    {successMsg.score} points
-                  </span>
-                  . Your rank has been updated.
+                  {successMsg.completed
+                    ? "You have completed all four quiz levels of the Classroom Challenge."
+                    : "You have completed the quiz level and are now eligible to access the next quiz."}
+                </p>
+                <p className="mt-1 text-sm font-bold text-white">
+                  Score: {successMsg.score} points
                 </p>
               </div>
             </div>
@@ -233,9 +235,33 @@ function LeaderboardContent() {
               VIEW ANSWERS <Eye size={20} strokeWidth={3} />
             </button>
           </div>
+
+          {!successMsg.completed && (
+            <div className="relative z-10 mt-6 rounded-2xl border border-[#95DDEA]/30 bg-white/10 p-5 text-center md:text-left">
+              <p className="text-sm font-medium text-white md:text-base">
+                The quiz link will remain valid until{" "}
+                <strong>20th September 2026</strong>.
+              </p>
+              <p className="mt-2 font-wwf text-xl tracking-wide text-[#F78623]">
+                🌊 Prepare Before You Play!
+              </p>
+              <p className="mt-1 text-sm font-medium text-[#95DDEA] md:text-base">
+                Before taking the next <strong>quiz</strong>, make sure you
+                prepare well and are ready to take on the challenge!
+              </p>
+              <p className="mt-2 text-sm font-medium break-all text-[#95DDEA] md:text-base">
+                Link:{" "}
+                <a
+                  href="https://wildwisdom.wwfindia.org/resources/"
+                  className="font-bold text-white underline underline-offset-4 hover:text-[#F78623]"
+                >
+                  https://wildwisdom.wwfindia.org/resources/
+                </a>
+              </p>
+            </div>
+          )}
         </div>
       )}
-
       <div className="grid gap-4 md:grid-cols-3 md:gap-6">
         <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:col-span-1 md:p-6">
           <div className="mb-4 flex items-center gap-2">
@@ -263,6 +289,14 @@ function LeaderboardContent() {
                 </p>
                 <p className="font-wwf text-5xl tracking-widest text-[#F78623]">
                   {myRank?.total_score || 0}
+                </p>
+                <p>
+                  {myRank?.total_time_taken !== undefined && (
+                    <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold text-[#003140]/50">
+                      <Clock size={12} />
+                      Time: {formatTime(myRank.total_time_taken)}
+                    </div>
+                  )}
                 </p>
                 {myRank?.date && (
                   <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold text-[#003140]/50">

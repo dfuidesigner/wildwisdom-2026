@@ -50,6 +50,13 @@ const webinars = [
     status: "LIVE",
     src: "webinar-1.mp4",
   },
+  {
+    session: "Webinar 2: Secret Life Of Corals",
+    speaker:
+      "Sumer Rao, Programme Coordinator - Marine Conservation, WWF India",
+    status: "LIVE",
+    src: "webinar-2.mp4",
+  },
 ]
 ---
 
@@ -442,7 +449,9 @@ const webinars = [
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:mx-auto md:max-w-3xl">
+      <div
+        class="grid grid-cols-1 gap-8 md:mx-auto md:max-w-3xl lg:grid-cols-2"
+      >
         {
           webinars.map((webinar) => (
             <div class="flex flex-col items-center overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg transition-all hover:shadow-xl">

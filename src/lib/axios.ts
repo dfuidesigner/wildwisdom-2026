@@ -49,16 +49,14 @@
 import axios from "axios"
 
 export const api = axios.create({
-  baseURL: "http://localhost:8000/api/v2",
-  // baseURL:
-  //   import.meta.env.PUBLIC_API_URL || "",
+  // baseURL: "http://localhost:8000/api/v2",
+  baseURL: import.meta.env.PUBLIC_API_URL || "",
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
   },
 })
 
-// --- REQUEST INTERCEPTOR ---
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("ws_token")
@@ -70,20 +68,21 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// --- RESPONSE INTERCEPTOR ---
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
+        const hadToken = !!localStorage.getItem("ws_token")
         localStorage.removeItem("ws_token")
-        localStorage.removeItem("ws_user") // <-- NEW: Wipe the cached profile!
+        localStorage.removeItem("ws_user")
 
-        // Construct the correct login path using BASE_URL
         const loginPath = `${import.meta.env.BASE_URL}login`
 
-        // Don't cause an infinite loop if they are already on the login page
-        if (window.location.pathname !== loginPath) {
+        // Only hard-redirect if this was an authenticated session that
+        // got invalidated. A 401 straight from /login (wrong password)
+        // is just a validation error — let the calling component handle it.
+        if (hadToken && window.location.pathname !== loginPath) {
           window.location.assign(loginPath)
         }
       }

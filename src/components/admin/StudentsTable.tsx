@@ -232,7 +232,7 @@ export function StudentsTable({ students, isLoading, categorySlug }: Props) {
                               <span className="text-(--wwf-ocean)">
                                 {lvl.score}
                               </span>
-                              <button
+                              {/* <button
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   handleRetake(
@@ -246,7 +246,7 @@ export function StudentsTable({ students, isLoading, categorySlug }: Props) {
                                 className="ml-0.5 rounded p-0.5 text-(--wwf-ocean-deep)/50 opacity-0 transition-opacity hover:bg-white hover:text-(--wwf-ocean-deep) disabled:opacity-50 group-hover:opacity-100"
                               >
                                 <RotateCcw size={10} />
-                              </button>
+                              </button> */}
                             </div>
                           ))}
                         </div>

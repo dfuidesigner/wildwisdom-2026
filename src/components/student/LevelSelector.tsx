@@ -294,9 +294,9 @@ function LevelSelectorContent() {
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black tracking-widest text-(--wwf-ocean-light) uppercase">
+                        {/* <span className="text-[10px] font-black tracking-widest text-(--wwf-ocean-light) uppercase">
                           Level {level.level_number}
-                        </span>
+                        </span> */}
                         {isCurrent && (
                           <span className="animate-pulse rounded bg-(--wwf-coral) px-2 py-0.5 text-[9px] font-black tracking-widest text-white uppercase shadow-sm">
                             Up Next

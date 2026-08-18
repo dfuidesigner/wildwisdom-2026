@@ -2,7 +2,7 @@ import { QueryProvider } from "@/components/providers/QueryProvider"
 import { useGameplayEngine } from "@/hooks/useGameplayEngine"
 import { useAuth } from "@/hooks/useAuth"
 import { QuestionCard } from "./gameplay/QuestionCard"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -28,6 +28,7 @@ import type { ApiError } from "@/types/api"
 
 function GameplayContent() {
   const { user } = useAuth()
+  const questionTopRef = useRef<HTMLDivElement>(null)
 
   const params =
     typeof window !== "undefined"
@@ -36,6 +37,13 @@ function GameplayContent() {
   const levelId = params?.get("levelId") ?? null
 
   const { state, actions } = useGameplayEngine(levelId)
+
+  useEffect(() => {
+    questionTopRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    })
+  }, [state.currentIndex])
   const [hasStartedFocusMode, setHasStartedFocusMode] = useState(false)
   if (
     user?.role === "teacher" ||
@@ -185,15 +193,11 @@ function GameplayContent() {
           />
         </div>
 
-        <div className="p-6 sm:p-10">
+        <div ref={questionTopRef} className="scroll-mt-24 p-6 sm:p-10">
           {state.focusViolationMessage && (
-            <div className="mb-6 flex items-start gap-3 rounded-2xl border-2 border-red-400 bg-red-50 px-5 py-4 shadow-md">
-              <AlertTriangle
-                size={24}
-                className="mt-0.5 shrink-0 animate-pulse text-red-600"
-              />
-
-              <p className="text-base leading-snug font-black text-red-700">
+            <div className="sticky top-4 z-20 mb-6 flex items-center gap-3 rounded-2xl border-2 border-red-700 bg-red-600 px-5 py-4 text-white shadow-xl">
+              <AlertTriangle size={26} className="shrink-0 animate-pulse" />
+              <p className="text-base leading-snug font-black">
                 {state.focusViolationMessage}
               </p>
             </div>

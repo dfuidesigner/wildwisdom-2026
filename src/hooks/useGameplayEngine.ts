@@ -19,7 +19,7 @@ export function useGameplayEngine(levelId: string | null) {
     typeof window !== "undefined" &&
     ("ontouchstart" in window || navigator.maxTouchPoints > 0)
 
-  const MAX_FOCUS_VIOLATIONS = 5
+  const MAX_FOCUS_VIOLATIONS = 3
   const [focusViolationCount, setFocusViolationCount] = useState(0)
   const [focusViolationMessage, setFocusViolationMessage] = useState<
     string | null
