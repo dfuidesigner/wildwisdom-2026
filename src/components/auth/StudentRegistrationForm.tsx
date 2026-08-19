@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useForm, useWatch } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -33,15 +33,14 @@ const studentSchema = z
       .max(20, "School code is too long")
       .regex(/^[^<>]*$/, "Invalid characters detected"),
 
-    email: z
+    identifier: z
       .string()
-      .email("Please enter a valid email address")
-      .max(255, "Email is too long"),
-
-    phone_number: z
-      .string()
-      .length(10, "Phone number must be exactly 10 digits")
-      .regex(/^\d+$/, "Phone number must contain only numbers"),
+      .min(1, "Email or phone number is required")
+      .max(255, "Identifier is too long")
+      .refine((v) => {
+        const val = v.trim()
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || /^\d{10}$/.test(val)
+      }, "Enter a valid email address or a 10-digit mobile number"),
 
     otp: z
       .string()
@@ -78,11 +77,13 @@ const studentSchema = z
   })
 
 type StudentFormData = z.infer<typeof studentSchema>
-type RegisterPayload = StudentFormData
 
 interface SimpleApiResponse {
   status: "success" | "error"
   message?: string
+}
+interface AvailabilityResponse {
+  available: boolean
 }
 
 const getErrorMessage = (
@@ -90,21 +91,19 @@ const getErrorMessage = (
   fallback: string
 ) => {
   const res = error.response?.data
-
   if (res?.errors && Object.keys(res.errors).length > 0) {
     return Object.values(res.errors)[0]?.[0] || fallback
   }
-
   return res?.message || fallback
 }
 
 function StudentRegistrationFormComponent() {
   const queryClient = useQueryClient()
+  const PLATFORM_SLUG = import.meta.env.PUBLIC_PLATFORM_SLUG || "wildwisdom"
 
   const {
     register,
     handleSubmit,
-    control,
     setError,
     clearErrors,
     getValues,
@@ -115,8 +114,7 @@ function StudentRegistrationFormComponent() {
     resolver: zodResolver(studentSchema),
     defaultValues: {
       school_code: "",
-      email: "",
-      phone_number: "",
+      identifier: "",
       otp: "",
       section: "",
       roll_number: "",
@@ -126,85 +124,95 @@ function StudentRegistrationFormComponent() {
     },
   })
 
-  const watchedEmail = watch("email")
-  const watchedPhone = watch("phone_number")
-  const watchedOtp = watch("otp")
+  const watchedIdentifier = watch("identifier") ?? ""
+  const watchedOtp = watch("otp") ?? ""
+  const watchedSchoolCode = watch("school_code") ?? ""
 
-  const [debouncedPhone, setDebouncedPhone] = useState("")
+  // debounce
+  const [debouncedIdentifier, setDebouncedIdentifier] = useState("")
+  const [debouncedCode, setDebouncedCode] = useState("")
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedPhone(watchedPhone)
-    }, 500)
-
+    const timer = setTimeout(
+      () => setDebouncedIdentifier(watchedIdentifier),
+      500
+    )
     return () => clearTimeout(timer)
-  }, [watchedPhone])
+  }, [watchedIdentifier])
 
-  const { data: phoneCheck, isFetching: isCheckingPhone } = useQuery({
-    queryKey: ["checkStudentPhone", debouncedPhone],
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedCode(watchedSchoolCode), 500)
+    return () => clearTimeout(timer)
+  }, [watchedSchoolCode])
+
+  // detect channel from identifier
+  const debouncedTrimmed = debouncedIdentifier.trim()
+  const detectedIsEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(debouncedTrimmed)
+  const detectedIsPhone = /^\d{10}$/.test(debouncedTrimmed)
+  const channel: "phone" | "email" | null = detectedIsPhone
+    ? "phone"
+    : detectedIsEmail
+      ? "email"
+      : null
+
+  // identifier availability checks
+  const { data: phoneCheck } = useQuery({
+    queryKey: ["checkStudentPhone", debouncedIdentifier],
     queryFn: async () => {
-      const response = await api.get(`/student/check-phone/${debouncedPhone}`)
-      return response.data.data as { available: boolean }
+      const r = await api.get(`/student/check-phone/${debouncedTrimmed}`)
+      return r.data.data as AvailabilityResponse
     },
-    enabled: debouncedPhone.length === 10,
+    enabled: detectedIsPhone,
     retry: false,
   })
 
-  const phoneNumberTaken =
-    watchedPhone === debouncedPhone &&
-    debouncedPhone.length === 10 &&
-    phoneCheck?.available === false
+  const { data: emailCheck } = useQuery({
+    queryKey: ["checkStudentEmail", debouncedIdentifier],
+    queryFn: async () => {
+      const r = await api.get(
+        `/student/check-email?email=${encodeURIComponent(debouncedTrimmed)}`
+      )
+      return r.data.data as AvailabilityResponse
+    },
+    enabled: detectedIsEmail,
+    retry: false,
+  })
 
-  const showOtpInput =
-    watchedPhone?.length === 10 && phoneCheck?.available === true
+  const isTaken = detectedIsPhone
+    ? phoneCheck?.available === false
+    : detectedIsEmail
+      ? emailCheck?.available === false
+      : false
 
+  const isAvailable = detectedIsPhone
+    ? phoneCheck?.available === true
+    : detectedIsEmail
+      ? emailCheck?.available === true
+      : false
+
+  const showOtpInput = isAvailable
+
+  // OTP state
   const [otpSent, setOtpSent] = useState(false)
   const [otpVerified, setOtpVerified] = useState(false)
   const [resendSeconds, setResendSeconds] = useState(0)
 
+  // Reset OTP state whenever the identifier changes
   useEffect(() => {
     setOtpSent(false)
     setOtpVerified(false)
     setValue("otp", "")
-    clearErrors("phone_number")
-  }, [watchedEmail, watchedPhone, setValue, clearErrors])
+    clearErrors(["identifier"])
+  }, [watchedIdentifier, setValue, clearErrors])
 
-  useEffect(() => {
-    if (phoneNumberTaken) {
-      setError("phone_number", {
-        type: "manual",
-        message: "This mobile number is already registered.",
-      })
-    }
-  }, [phoneNumberTaken, setError])
-
+  // Resend countdown
   useEffect(() => {
     if (resendSeconds <= 0 || otpVerified) return
-
-    const timer = setTimeout(() => {
-      setResendSeconds((value) => value - 1)
-    }, 1000)
-
+    const timer = setTimeout(() => setResendSeconds((v) => v - 1), 1000)
     return () => clearTimeout(timer)
   }, [resendSeconds, otpVerified])
 
-  const currentSchoolCode = useWatch({
-    control,
-    name: "school_code",
-  })
-
-  const [debouncedCode, setDebouncedCode] = useState("")
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedCode(currentSchoolCode)
-    }, 500)
-
-    return () => clearTimeout(timer)
-  }, [currentSchoolCode])
-
-  const PLATFORM_SLUG = import.meta.env.PUBLIC_PLATFORM_SLUG || "wildwisdom"
-
+  // school code check
   const {
     data: schoolInfo,
     isFetching: isCheckingSchool,
@@ -212,35 +220,40 @@ function StudentRegistrationFormComponent() {
   } = useQuery({
     queryKey: ["checkSchoolCode", debouncedCode],
     queryFn: async () => {
-      const response = await api.get(
+      const r = await api.get(
         `/schools/verify/${PLATFORM_SLUG}/${debouncedCode}`
       )
-      return response.data.data
+      return r.data.data
     },
     enabled: debouncedCode.length >= 4,
     retry: false,
   })
 
+  // mutations
+  const identifierPayload = () => {
+    const val = getValues("identifier").trim()
+    return channel === "phone" ? { phone_number: val } : { email: val }
+  }
+
   const sendOtpMutation = useMutation<
     SimpleApiResponse,
     AxiosError<ValidationErrorResponse>,
-    {
-      email: string
-      phone_number: string
-    }
+    { email?: string; phone_number?: string }
   >({
     mutationFn: async (payload) => {
-      const response = await api.post("/student/send-otp", payload)
-      return response.data
+      const r = await api.post("/student/send-otp", payload)
+      return r.data
     },
     onSuccess: (data) => {
       setOtpSent(true)
       setOtpVerified(false)
       setValue("otp", "")
       setResendSeconds(60)
-
       toast.success("OTP Sent", {
-        description: data.message || "OTP sent to your mobile number.",
+        description:
+          channel === "phone"
+            ? "OTP sent to your mobile."
+            : "OTP sent to your email address.",
       })
     },
     onError: (error) => {
@@ -253,26 +266,20 @@ function StudentRegistrationFormComponent() {
   const verifyOtpMutation = useMutation<
     SimpleApiResponse,
     AxiosError<ValidationErrorResponse>,
-    {
-      email: string
-      phone_number: string
-      otp: string
-    }
+    { email?: string; phone_number?: string; otp: string }
   >({
     mutationFn: async (payload) => {
-      const response = await api.post("/student/verify-otp", payload)
-      return response.data
+      const r = await api.post("/student/verify-otp", payload)
+      return r.data
     },
     onSuccess: (data) => {
       setOtpVerified(true)
-
       toast.success("OTP Verified", {
         description: data.message || "You can now complete registration.",
       })
     },
     onError: (error) => {
       setOtpVerified(false)
-
       toast.error("OTP Verification Failed", {
         description: getErrorMessage(error, "Invalid or expired OTP."),
       })
@@ -282,11 +289,11 @@ function StudentRegistrationFormComponent() {
   const registerMutation = useMutation<
     StudentRegisterResponse,
     AxiosError<ValidationErrorResponse>,
-    RegisterPayload
+    Record<string, string>
   >({
     mutationFn: async (data) => {
-      const response = await api.post("/register-student", data)
-      return response.data
+      const r = await api.post("/register-student", data)
+      return r.data
     },
     onSuccess: async (data) => {
       localStorage.setItem("ws_token", data.token)
@@ -302,53 +309,35 @@ function StudentRegistrationFormComponent() {
       }, 800)
     },
     onError: (error) => {
-      const message = getErrorMessage(
-        error,
-        "Could not register. Please try again."
-      )
-
-      toast.error("Registration Failed", { description: message })
+      toast.error("Registration Failed", {
+        description: getErrorMessage(error, "Could not register."),
+      })
     },
   })
 
+  // handlers
   const handleSendOtp = async () => {
     clearErrors("root")
-
-    const email = getValues("email")
-    const phoneNumber = getValues("phone_number")
-
-    if (!email || phoneNumber.length !== 10) {
-      toast.error("Missing Details", {
-        description: "Enter a valid email and 10 digit mobile number first.",
+    if (!channel) {
+      toast.error("Provide a contact", {
+        description:
+          "Enter a valid 10-digit mobile number or email so we can send your code.",
       })
       return
     }
-
-    sendOtpMutation.mutate({
-      email,
-      phone_number: phoneNumber,
-    })
+    sendOtpMutation.mutate(identifierPayload())
   }
 
   const handleVerifyOtp = async () => {
     clearErrors("root")
-
-    const email = getValues("email")
-    const phoneNumber = getValues("phone_number")
     const otp = getValues("otp")
-
-    if (!email || phoneNumber.length !== 10 || otp.length !== 6) {
-      toast.error("Invalid OTP Details", {
-        description: "Enter the 6 digit OTP sent to your mobile.",
+    if (!channel || otp.length !== 6) {
+      toast.error("Invalid code", {
+        description: "Enter the 6-digit code we just sent.",
       })
       return
     }
-
-    verifyOtpMutation.mutate({
-      email,
-      phone_number: phoneNumber,
-      otp,
-    })
+    verifyOtpMutation.mutate({ ...identifierPayload(), otp })
   }
 
   const onSubmit = async (data: StudentFormData) => {
@@ -356,18 +345,30 @@ function StudentRegistrationFormComponent() {
 
     if (!otpVerified) {
       toast.error("OTP Required", {
-        description: "Please verify your mobile OTP before registering.",
+        description: "Please verify your code before registering.",
       })
       return
     }
 
     try {
       const encryptedPassword = await encryptPayload(data.password)
+      const input = data.identifier.trim()
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input)
 
-      const payload: RegisterPayload = {
-        ...data,
+      const payload: Record<string, string> = {
+        otp: data.otp,
+        grade: data.grade,
+        section: data.section,
+        roll_number: data.roll_number,
         password: encryptedPassword,
         password_confirmation: encryptedPassword,
+        school_code: data.school_code,
+      }
+
+      if (isEmail) {
+        payload.email = input
+      } else {
+        payload.phone_number = input
       }
 
       registerMutation.mutate(payload)
@@ -379,23 +380,28 @@ function StudentRegistrationFormComponent() {
     }
   }
 
+  // render helpers
   const renderInput = (
     name: keyof StudentFormData,
     placeholder: string,
-    type = "text",
+    type: string = "text",
     maxLength?: number,
-    disabled = registerMutation.isPending
+    disabled: boolean = registerMutation.isPending,
+    onInputSanitizer?: (raw: string) => string
   ) => (
     <div className="w-full space-y-1">
       <input
+        id={name}
         type={type}
         placeholder={placeholder}
         maxLength={maxLength}
         {...register(name)}
         disabled={disabled}
         onInput={(e) => {
-          if (name === "phone_number" || name === "otp") {
-            e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, "")
+          if (onInputSanitizer) {
+            const cleaned = onInputSanitizer(e.currentTarget.value)
+            if (cleaned !== e.currentTarget.value)
+              e.currentTarget.value = cleaned
           }
         }}
         className={`flex h-14 w-full rounded-2xl border-2 bg-slate-50/50 px-4 py-2 text-base font-medium text-(--wwf-ocean-deep) transition-all placeholder:text-slate-500 focus:bg-white focus:ring-4 focus:ring-(--wwf-ocean)/20 focus:outline-none disabled:opacity-50 ${
@@ -406,7 +412,7 @@ function StudentRegistrationFormComponent() {
       />
       {errors[name] && (
         <p className="ml-1 text-xs font-bold text-red-500">
-          {errors[name]?.message}
+          {errors[name]?.message as string}
         </p>
       )}
     </div>
@@ -419,6 +425,7 @@ function StudentRegistrationFormComponent() {
   ) => (
     <div className="w-full space-y-1">
       <select
+        id={name}
         {...register(name)}
         disabled={registerMutation.isPending}
         className={`flex h-14 w-full rounded-2xl border-2 bg-slate-50/50 px-4 py-2 text-base font-medium text-(--wwf-ocean-deep) transition-all focus:bg-white focus:ring-4 focus:ring-(--wwf-ocean)/20 focus:outline-none disabled:opacity-50 ${
@@ -438,7 +445,7 @@ function StudentRegistrationFormComponent() {
       </select>
       {errors[name] && (
         <p className="ml-1 text-xs font-bold text-red-500">
-          {errors[name]?.message}
+          {errors[name]?.message as string}
         </p>
       )}
     </div>
@@ -446,6 +453,7 @@ function StudentRegistrationFormComponent() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" noValidate>
+      {/* School Authorization */}
       <fieldset>
         <legend className="mb-2 text-2xl font-bold text-(--wwf-ocean-deep)">
           School Authorization
@@ -508,40 +516,66 @@ function StudentRegistrationFormComponent() {
         </div>
       </fieldset>
 
+      {/* Student Information */}
       <fieldset className="pt-4">
         <legend className="mb-1 text-2xl font-bold text-(--wwf-ocean-deep)">
           Student Information
         </legend>
 
-        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {renderInput("email", "Email Address*", "email")}
+        <p className="mb-5 text-xs font-semibold text-slate-500">
+          Enter your <strong>email address</strong> or{" "}
+          <strong>10-digit mobile number</strong> — we'll send a verification
+          code there.
+        </p>
+
+        {renderInput("identifier", "Email or 10-digit mobile number*")}
+
+        <div className="mt-4 mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {renderSelect("grade", "Select Grade*", grades)}
-        </div>
-
-        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {renderInput("roll_number", "Roll Number*")}
-          {renderInput("section", "Section*")}
         </div>
 
-        <div className="mb-4">
-          {renderInput("phone_number", "Mobile Number*", "tel", 10)}
-        </div>
+        <div className="mb-4">{renderInput("section", "Section*")}</div>
 
+        {/* Taken identifier notice */}
+        {isTaken && channel && (
+          <div className="mb-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+            <XCircle className="h-5 w-5 shrink-0" />
+            {channel === "phone"
+              ? "This mobile number is already registered."
+              : "This email is already registered."}
+          </div>
+        )}
+
+        {/* OTP section */}
         {showOtpInput && (
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <div className="mb-3 flex items-center gap-2 text-sm font-bold text-(--wwf-ocean-deep)">
               <ShieldCheck size={18} />
-              Mobile OTP Verification
+              {channel === "phone"
+                ? "Mobile Verification"
+                : "Email Verification"}
             </div>
 
             <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-              {renderInput(
-                "otp",
-                "Enter 6 digit OTP",
-                "text",
-                6,
-                registerMutation.isPending || !otpSent || otpVerified
-              )}
+              <input
+                id="otp"
+                type="text"
+                maxLength={6}
+                placeholder="Enter 6 digit OTP"
+                disabled={registerMutation.isPending || !otpSent || otpVerified}
+                {...register("otp")}
+                onInput={(e) => {
+                  e.currentTarget.value = e.currentTarget.value
+                    .replace(/[^0-9]/g, "")
+                    .slice(0, 6)
+                }}
+                className={`flex h-14 w-full rounded-2xl border-2 bg-slate-50/50 px-4 py-2 text-base font-medium text-(--wwf-ocean-deep) transition-all placeholder:text-slate-500 focus:bg-white focus:ring-4 focus:ring-(--wwf-ocean)/20 focus:outline-none disabled:opacity-50 ${
+                  errors.otp
+                    ? "border-red-200 focus:border-red-500"
+                    : "border-slate-200 hover:border-(--wwf-ocean-light)/50 focus:border-(--wwf-ocean)"
+                }`}
+              />
 
               <button
                 type="button"
@@ -550,7 +584,7 @@ function StudentRegistrationFormComponent() {
                   sendOtpMutation.isPending ||
                   verifyOtpMutation.isPending ||
                   otpVerified ||
-                  (otpSent && watchedOtp?.length !== 6)
+                  (otpSent && watchedOtp.length !== 6)
                 }
                 className="h-14 rounded-2xl bg-(--wwf-ocean-deep) px-5 text-sm font-bold text-white disabled:opacity-50"
               >
@@ -562,7 +596,9 @@ function StudentRegistrationFormComponent() {
                       ? "Sending..."
                       : otpSent
                         ? "Verify OTP"
-                        : "Send OTP"}
+                        : channel === "email"
+                          ? "Send Email OTP"
+                          : "Send SMS OTP"}
               </button>
             </div>
 
@@ -575,7 +611,7 @@ function StudentRegistrationFormComponent() {
               >
                 <RefreshCw size={13} />
                 {resendSeconds > 0
-                  ? `Resend OTP in ${resendSeconds}s`
+                  ? `Resend in ${resendSeconds}s`
                   : "Resend OTP"}
               </button>
             )}
@@ -583,6 +619,7 @@ function StudentRegistrationFormComponent() {
         )}
       </fieldset>
 
+      {/* Security */}
       <fieldset className="pt-4">
         <legend className="text-2xl font-bold text-(--wwf-ocean-deep)">
           Security
@@ -621,7 +658,7 @@ function StudentRegistrationFormComponent() {
               Registering...
             </>
           ) : !otpVerified ? (
-            <>Verify OTP to Continue</>
+            <>Verify your code to continue</>
           ) : (
             <>Submit and Play</>
           )}

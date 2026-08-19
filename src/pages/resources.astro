@@ -44,9 +44,8 @@ const learningPdfs = [
 const webinars = [
   {
     session:
-      "Webinar 1 An Ocean Odyssey- Fantastic Giants and Where to Find Them???",
-    speaker:
-      "Dr. Anant Pande - Head- Oceans & Coasts Conservation, WWF-India. ",
+      "Webinar 1: An Ocean Odyssey- Fantastic Giants and Where to Find Them???",
+    speaker: "Dr. Anant Pande - Head- Oceans & Coasts Conservation, WWF-India.",
     status: "LIVE",
     src: "webinar-1.mp4",
   },
@@ -56,6 +55,13 @@ const webinars = [
       "Sumer Rao, Programme Coordinator - Marine Conservation, WWF India",
     status: "LIVE",
     src: "webinar-2.mp4",
+  },
+  {
+    session: "Webinar 3: Understanding the Marine Megafauna of our Ocean",
+    speaker:
+      "Professor BC Choudhary, Advisor Wildlife Projects WTI & WWF-India",
+    status: "LIVE",
+    src: "webinar-3.mp4",
   },
 ]
 ---
@@ -70,7 +76,6 @@ const webinars = [
         <h2
           class="text-ocean-deep font-wwf text-3xl tracking-wide uppercase md:text-5xl"
         >
-          <!-- Dive Into Marine Studies -->
           Ocean Explorer’s Hub
         </h2>
         <p class="text-ocean-semi-dark mt-3 text-lg font-medium md:text-xl">
@@ -160,7 +165,6 @@ const webinars = [
             schools.
           </p>
 
-          <!-- Styled CTA Button with Lucide 'arrow-right' Icon -->
           <a
             href="https://www.itza.io"
             target="_blank"
@@ -168,7 +172,6 @@ const webinars = [
             class="inline-flex items-center gap-2 rounded-full bg-[#259cb4] px-7 py-3.5 font-semibold text-white shadow-md transition-all duration-200 hover:bg-[#f78623] hover:shadow-lg focus:ring-2 focus:ring-[#259cb4] focus:ring-offset-2 focus:outline-none"
           >
             <span>Start now at itza.io</span>
-            <!-- Lucide Icon: arrow-right -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -186,20 +189,9 @@ const webinars = [
             </svg>
           </a>
         </div>
-        {/* Right Column: Visuals (Image & Video) */}
-        <div class="flex w-full flex-col gap-6 lg:w-1/2">
-          {/* Static Image */}
-          <!-- <div
-            class="relative overflow-hidden rounded-3xl shadow-xl transition-transform duration-500 hover:scale-[1.02]"
-          >
-            <img
-              src={`${baseUrl}images/itza-image.png`}
-              alt="ITZA Oceans Learning Journey"
-              class="h-auto w-full rounded-3xl border-4 border-white object-cover"
-            />
-          </div> -->
 
-          {/* Promo Video */}
+        {/* Right Column: Visuals */}
+        <div class="flex w-full flex-col gap-6 lg:w-1/2">
           <div
             class="relative overflow-hidden rounded-3xl border-4 border-white bg-black shadow-xl transition-transform duration-500 hover:scale-[1.02]"
           >
@@ -225,58 +217,12 @@ const webinars = [
     </Container>
   </section>
 
-  {/* ======================= PRACTICE QUIZ ======================= */}
-  <!-- <section class="bg-ocean-deep relative overflow-hidden py-20 md:py-32">
-    <div class="absolute inset-0 opacity-40 mix-blend-overlay">
-      <img
-        src={`${baseUrl}images/hero-banner.webp`}
-        alt="Ocean bg"
-        class="h-full w-full object-cover"
-      />
-    </div>
-    <Container
-      class="relative z-10 flex flex-col items-center gap-6 text-center"
-    >
-      <h2
-        class="font-wwf text-3xl tracking-wide text-white uppercase drop-shadow-md md:text-5xl"
-      >
-        Take part in the practice quiz!
-      </h2>
-      <p class="max-w-2xl text-lg text-white drop-shadow-md md:text-xl">
-        Think you know the ocean? Take the quiz, test your knowledge, and see
-        how you measure up against the best!
-      </p>
-      <div class="mt-6 flex flex-col gap-4 sm:flex-row">
-        <a
-          href="https://wildwisdom.wwfindia.org/play/levels"
-          target="_blank"
-          class="text-ocean-deep hover:bg-sea-green inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 font-wwf text-xl tracking-wide shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:scale-95"
-        >
-          <span class="wwf-span-font">Practice Quiz</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            ><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg
-          >
-        </a>
-      </div>
-    </Container>
-  </section> -->
-
   {
     /* ======================= ONE PLANET ACADEMY RESOURCES ======================= */
   }
   <section
     class="relative overflow-hidden bg-gradient-to-b from-[var(--wwf-ocean-deep)] to-[var(--wwf-ocean-dark)] py-20 md:py-32"
   >
-    {/* Decorative background glows */}
     <div
       class="absolute top-0 -left-10 h-72 w-72 rounded-full bg-[var(--wwf-ocean)] opacity-20 mix-blend-overlay blur-3xl filter"
     >
@@ -449,9 +395,7 @@ const webinars = [
         </p>
       </div>
 
-      <div
-        class="grid grid-cols-1 gap-8 md:mx-auto md:max-w-3xl lg:grid-cols-2"
-      >
+      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {
           webinars.map((webinar) => (
             <div class="flex flex-col items-center overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg transition-all hover:shadow-xl">
@@ -477,7 +421,7 @@ const webinars = [
                 </div>
               ) : (
                 <video
-                  data-src={`/video/${webinar.src}`}
+                  data-src={`${baseUrl}video/${webinar.src}`}
                   class="lazy-video aspect-video w-full bg-black object-cover"
                   controls
                   preload="none"
@@ -497,10 +441,6 @@ const webinars = [
       </div>
     </Container>
   </section>
-
-  {
-    /* NOTE: Bio-Blitz Activity section has been kept hidden/commented out based on previous structure */
-  }
 </MainLayout>
 
 {/* Video Lazy Loading Script */}

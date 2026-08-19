@@ -18,6 +18,7 @@ import {
   ArrowRight,
   FileExclamationPoint,
   Smartphone,
+  Mail,
 } from "lucide-react"
 
 import {
@@ -27,11 +28,16 @@ import {
   InputOTPSeparator,
 } from "@/components/ui/input-otp"
 
+// Step 1: identifier can be either a 10-digit phone OR an email
 const stepOneSchema = z.object({
-  phone_number: z
+  identifier: z
     .string()
-    .length(10, "Phone number must be exactly 10 digits")
-    .regex(/^\d+$/, "Phone number must contain only numbers"),
+    .min(1, "Email or 10-digit phone number is required")
+    .max(255, "Input is too long")
+    .refine(
+      (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || /^\d{10}$/.test(v),
+      "Enter a valid email or 10-digit phone number"
+    ),
 })
 
 const stepTwoSchema = z.object({
@@ -58,6 +64,8 @@ type StepOneData = z.infer<typeof stepOneSchema>
 type StepTwoData = z.infer<typeof stepTwoSchema>
 type StepThreeData = z.infer<typeof stepThreeSchema>
 
+type Channel = "phone" | "email"
+
 interface ApiResponse {
   status: string
   message: string
@@ -81,26 +89,34 @@ const getErrorMessage = (
   return res?.message || defaultMsg
 }
 
+const detectChannel = (raw: string): Channel =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw) ? "email" : "phone"
+
 function PasswordRecoveryContent() {
   const [step, setStep] = useState<1 | 2 | 3>(1)
-  const [savedPhone, setSavedPhone] = useState("")
+  const [savedIdentifier, setSavedIdentifier] = useState("")
+  const [channel, setChannel] = useState<Channel>("phone")
   const [savedCode, setSavedCode] = useState("")
   const [resendSeconds, setResendSeconds] = useState(0)
 
   useEffect(() => {
     if (resendSeconds <= 0) return
-
     const timer = setTimeout(() => {
       setResendSeconds((value) => value - 1)
     }, 1000)
-
     return () => clearTimeout(timer)
   }, [resendSeconds])
 
+  // ---- STEP 1 ----------------------------------------------------
   const formOne = useForm<StepOneData>({
     resolver: zodResolver(stepOneSchema),
-    defaultValues: { phone_number: "" },
+    defaultValues: { identifier: "" },
   })
+
+  const identifierPayload = () =>
+    channel === "phone"
+      ? { phone_number: savedIdentifier }
+      : { email: savedIdentifier }
 
   const sendCodeMutation = useMutation<
     ApiResponse,
@@ -108,11 +124,16 @@ function PasswordRecoveryContent() {
     StepOneData
   >({
     mutationFn: async (data) => {
-      const response = await api.post("/recovery/send-code", data)
+      const payload =
+        detectChannel(data.identifier) === "phone"
+          ? { phone_number: data.identifier }
+          : { email: data.identifier }
+      const response = await api.post("/recovery/send-code", payload)
       return response.data
     },
     onSuccess: (data, variables) => {
-      setSavedPhone(variables.phone_number)
+      setSavedIdentifier(variables.identifier.trim())
+      setChannel(detectChannel(variables.identifier))
       setSavedCode("")
       setStep(2)
       setResendSeconds(60)
@@ -120,7 +141,10 @@ function PasswordRecoveryContent() {
 
       toast.success("OTP Sent!", {
         description:
-          data.message || "OTP sent to your registered mobile number.",
+          data.message ||
+          (channel === "phone"
+            ? "OTP sent to your registered mobile number."
+            : "OTP sent to your registered email address."),
       })
     },
     onError: (error) => {
@@ -136,9 +160,10 @@ function PasswordRecoveryContent() {
     void
   >({
     mutationFn: async () => {
-      const response = await api.post("/recovery/send-code", {
-        phone_number: savedPhone,
-      })
+      const response = await api.post(
+        "/recovery/send-code",
+        identifierPayload()
+      )
       return response.data
     },
     onSuccess: (data) => {
@@ -159,7 +184,8 @@ function PasswordRecoveryContent() {
 
   const onSubmitStepOne = async (data: StepOneData) => {
     formOne.clearErrors("root")
-    sendCodeMutation.mutate(data)
+    setChannel(detectChannel(data.identifier))
+    sendCodeMutation.mutate({ ...data, identifier: data.identifier.trim() })
   }
 
   const onResendCode = async () => {
@@ -167,6 +193,7 @@ function PasswordRecoveryContent() {
     resendCodeMutation.mutate()
   }
 
+  // ---- STEP 2 ----------------------------------------------------
   const formTwo = useForm<StepTwoData>({
     resolver: zodResolver(stepTwoSchema),
     defaultValues: { code: "" },
@@ -181,8 +208,8 @@ function PasswordRecoveryContent() {
   >({
     mutationFn: async (data) => {
       const response = await api.post("/recovery/verify-code", {
-        ...data,
-        phone_number: savedPhone,
+        ...identifierPayload(),
+        code: data.code,
       })
       return response.data
     },
@@ -207,6 +234,7 @@ function PasswordRecoveryContent() {
     verifyCodeMutation.mutate(data)
   }
 
+  // ---- STEP 3 ----------------------------------------------------
   const formThree = useForm<StepThreeData>({
     resolver: zodResolver(stepThreeSchema),
     defaultValues: { password: "", password_confirmation: "" },
@@ -219,8 +247,7 @@ function PasswordRecoveryContent() {
       password: string
       password_confirmation: string
       code: string
-      phone_number: string
-    }
+    } & ({ email: string } | { phone_number: string })
   >({
     mutationFn: async (data) => {
       const response = await api.post("/recovery/reset", data)
@@ -246,9 +273,9 @@ function PasswordRecoveryContent() {
   const onSubmitStepThree = async (data: StepThreeData) => {
     formThree.clearErrors("root")
 
-    if (!savedPhone || !savedCode) {
+    if (!savedIdentifier || !savedCode) {
       toast.error("OTP Required", {
-        description: "Please verify OTP before resetting password.",
+        description: "Please verify your OTP before resetting password.",
       })
       setStep(1)
       return
@@ -260,8 +287,10 @@ function PasswordRecoveryContent() {
       resetMutation.mutate({
         password: encryptedPassword,
         password_confirmation: encryptedPassword,
-        phone_number: savedPhone,
         code: savedCode,
+        ...(channel === "phone"
+          ? { phone_number: savedIdentifier }
+          : { email: savedIdentifier }),
       })
     } catch {
       formThree.setError("root.serverError", {
@@ -271,6 +300,14 @@ function PasswordRecoveryContent() {
     }
   }
 
+  const channelIcon =
+    channel === "email" ? (
+      <Mail className="h-5 w-5" />
+    ) : (
+      <Smartphone className="h-5 w-5" />
+    )
+
+  // ---- RENDER ----------------------------------------------------
   return (
     <div className="w-full">
       <div className="mb-8 flex items-center justify-center gap-2 sm:gap-4">
@@ -288,7 +325,7 @@ function PasswordRecoveryContent() {
           >
             1
           </div>
-          <span className="hidden sm:inline">Mobile</span>
+          <span className="hidden sm:inline">Contact</span>
         </div>
 
         <div
@@ -346,56 +383,55 @@ function PasswordRecoveryContent() {
         >
           <div className="mb-6 text-center">
             <p className="font-medium text-(--wwf-ocean-deep)">
-              Enter your registered mobile number. We will send a 6 digit OTP.
+              Enter the <strong>email</strong> or <strong>mobile number</strong>{" "}
+              on your account — we'll send a 6-digit OTP there.
             </p>
           </div>
 
           <div className="space-y-1.5">
             <label
-              htmlFor="phone_number"
+              htmlFor="identifier"
               className="ml-1 text-xs font-black tracking-widest text-(--wwf-ocean-light) uppercase"
             >
-              Registered Mobile Number
+              Email or Mobile Number
             </label>
 
             <input
-              id="phone_number"
-              type="tel"
-              placeholder="10 digit mobile number"
-              maxLength={10}
+              id="identifier"
+              type="text"
+              placeholder="you@example.com  or  9876543210"
               disabled={sendCodeMutation.isPending}
-              {...formOne.register("phone_number")}
+              {...formOne.register("identifier")}
               onInput={(e) => {
-                e.currentTarget.value = e.currentTarget.value
-                  .replace(/[^0-9]/g, "")
-                  .slice(0, 10)
+                const raw = e.currentTarget.value.trim()
+                const isPhoneSoFar = /^\d+$/.test(raw)
+                if (isPhoneSoFar) {
+                  e.currentTarget.value = raw.slice(0, 10)
+                }
               }}
               className={`flex h-12 w-full rounded-xl border-2 bg-white/80 px-4 py-2 text-sm font-medium text-(--wwf-ocean-deep) transition-all focus:ring-4 focus:ring-(--wwf-sea-green)/20 focus:outline-none disabled:opacity-50 ${
-                formOne.formState.errors.phone_number
+                formOne.formState.errors.identifier
                   ? "border-red-200 focus:border-red-500"
                   : "border-slate-200 focus:border-(--wwf-sea-green)"
               }`}
             />
 
-            {formOne.formState.errors.phone_number && (
+            {formOne.formState.errors.identifier && (
               <p className="ml-1 text-xs font-bold text-red-500">
-                {formOne.formState.errors.phone_number.message}
+                {formOne.formState.errors.identifier.message}
               </p>
             )}
           </div>
 
           <button
             type="submit"
-            disabled={
-              sendCodeMutation.isPending ||
-              formOne.watch("phone_number")?.length !== 10
-            }
+            disabled={sendCodeMutation.isPending}
             className="btn-wwf-primary group relative mt-4 flex h-14 w-full items-center justify-center gap-2 overflow-hidden rounded-xl text-lg font-black shadow-xl hover:-translate-y-1 disabled:pointer-events-none disabled:opacity-50"
           >
             {sendCodeMutation.isPending ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              <Smartphone className="h-5 w-5" />
+              channelIcon
             )}
             Send OTP
           </button>
@@ -409,7 +445,7 @@ function PasswordRecoveryContent() {
           noValidate
         >
           <div className="mb-6 rounded-xl bg-(--wwf-sea-green)/10 p-4 text-center text-sm font-medium text-(--wwf-ocean-deep)">
-            OTP sent to <strong>{savedPhone}</strong>.
+            OTP sent to <strong>{savedIdentifier}</strong>.
           </div>
 
           <div className="flex flex-col items-center space-y-2">
@@ -504,7 +540,7 @@ function PasswordRecoveryContent() {
             onClick={() => setStep(1)}
             className="mt-2 flex w-full items-center justify-center text-xs font-bold text-(--wwf-ocean) transition-colors hover:text-(--wwf-ocean-deep)"
           >
-            <ArrowLeft className="mr-1 h-3 w-3" /> Wrong number? Go back.
+            <ArrowLeft className="mr-1 h-3 w-3" /> Wrong contact? Go back.
           </button>
         </form>
       )}

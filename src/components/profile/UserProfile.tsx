@@ -20,6 +20,7 @@ import {
   X,
   KeyRound,
   FileExclamationPoint,
+  Phone,
 } from "lucide-react"
 import type { AxiosError } from "axios"
 
@@ -242,20 +243,42 @@ function UserProfileContent() {
 
               <div className="overflow-hidden rounded-3xl border border-(--wwf-ocean-light)/15 bg-white shadow-sm">
                 <div className="flex flex-col divide-y divide-(--wwf-ocean-light)/10">
-                  <div className="flex items-center gap-5 p-5 transition-colors hover:bg-slate-50">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F0F4F8] text-(--wwf-ocean)">
-                      <Mail size={18} />
-                    </div>
-                    <div className="flex flex-1 flex-col justify-center overflow-hidden">
-                      <p className="mb-0.5 text-[10px] font-black tracking-widest text-(--wwf-ocean-light) uppercase">
-                        Email Address
-                      </p>
-                      <p className="truncate text-base font-bold text-(--wwf-ocean-deep)">
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
+                  {/* Email */}
+                  {user.email && (
+                    <div className="flex items-center gap-5 p-5 transition-colors hover:bg-slate-50">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F0F4F8] text-(--wwf-ocean)">
+                        <Mail size={18} />
+                      </div>
 
+                      <div className="flex flex-1 flex-col justify-center overflow-hidden">
+                        <p className="mb-0.5 text-[10px] font-black tracking-widest text-(--wwf-ocean-light) uppercase">
+                          Email Address
+                        </p>
+
+                        <p className="truncate text-base font-bold text-(--wwf-ocean-deep)">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {user.phone_number && (
+                    <div className="flex items-center gap-5 p-5 transition-colors hover:bg-slate-50">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F0F4F8] text-(--wwf-ocean)">
+                        <Phone size={18} />
+                      </div>
+
+                      <div className="flex flex-1 flex-col justify-center overflow-hidden">
+                        <p className="mb-0.5 text-[10px] font-black tracking-widest text-(--wwf-ocean-light) uppercase">
+                          Mobile Number
+                        </p>
+
+                        <p className="truncate text-base font-bold text-(--wwf-ocean-deep)">
+                          {user.phone_number}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   <div className="flex items-center gap-5 p-5 transition-colors hover:bg-slate-50">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F0F4F8] text-(--wwf-ocean)">
                       <Building2 size={18} />

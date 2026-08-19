@@ -9,6 +9,7 @@ import {
   Medal,
   ShieldAlert,
   ArrowLeft,
+  UserPlus,
 } from "lucide-react"
 import OceanElement from "../home/OceanElement"
 
@@ -61,13 +62,22 @@ export function QuizGuidelines() {
               Classroom Challenge Round - structure & instructions.
             </p>
           </div>
-          <a
-            href={`${baseUrl}play/levels`}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-(--wwf-ocean-deep) shadow-sm transition-all hover:bg-slate-50 active:scale-95"
-          >
-            <ArrowLeft size={16} />
-            Back to Dashboard
-          </a>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <a
+              href={`${baseUrl}register/student`}
+              className="guidelines-blink inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#F78623] px-5 py-2.5 text-sm font-black tracking-wide text-white uppercase shadow-md transition-all hover:bg-[#e07518] active:scale-95"
+            >
+              <UserPlus size={16} />
+              Register Now
+            </a>
+            <a
+              href={`${baseUrl}play/levels`}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-(--wwf-ocean-deep) shadow-sm transition-all hover:bg-slate-50 active:scale-95"
+            >
+              <ArrowLeft size={16} />
+              Back to Dashboard
+            </a>
+          </div>
         </div>
 
         {/* Round Overview */}
@@ -275,6 +285,37 @@ export function QuizGuidelines() {
           </div>
         </div>
 
+        {/* Fair Play / AI Disclaimer */}
+        <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-6 shadow-sm">
+          <div className="mb-3 flex items-center gap-2 text-amber-900">
+            <ShieldAlert size={22} className="shrink-0" />
+            <h3 className="text-base font-black tracking-wide uppercase">
+              Important Notice for Students
+            </h3>
+          </div>
+          <div className="space-y-3 text-sm leading-relaxed font-semibold text-amber-950 md:text-base">
+            <p>
+              This quiz platform is designed for WWGC participants to test and
+              enhance your knowledge oceans.
+            </p>
+            <p>
+              Therefore, please attempt all questions independently and do not
+              use AI tools, search engines, or any other unfair means to obtain
+              answers.
+            </p>
+            <p>
+              Clearing this round using outside assistance may not help you in
+              the subsequent rounds, which may use different formats and
+              platforms. Your performance in later rounds will depend on your
+              genuine understanding and ability.
+            </p>
+            <p className="border-t border-amber-300 pt-3 font-black text-(--wwf-ocean-deep)">
+              Give it your best effort, play fair, and let your knowledge speak
+              for itself.
+            </p>
+          </div>
+        </div>
+
         {/* Procedural Steps, Leaderboards, & Warnings Split Container */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Step Workflow System */}
@@ -439,7 +480,14 @@ export function QuizGuidelines() {
             </div>
 
             {/* Action Button Navigation back to selector */}
-            <div className="pt-2">
+            <div className="flex flex-col gap-3 pt-2">
+              <a
+                href={`${baseUrl}register/student`}
+                className="guidelines-blink flex w-full items-center justify-center gap-2 rounded-2xl bg-[#F78623] py-4 font-black tracking-wide text-white uppercase shadow-md transition-all hover:bg-[#e07518] hover:shadow-lg active:scale-95"
+              >
+                <UserPlus size={18} />
+                Register Now
+              </a>
               <a
                 href={`${baseUrl}play/levels`}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-(--wwf-ocean-deep) py-4 font-bold text-white shadow-md transition-all hover:bg-slate-800 hover:shadow-lg active:scale-95"

@@ -1,8 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { useAuth } from "@/hooks/useAuth"
-import { useState } from "react"
-import { AnswerKeyModal } from "@/components/play/AnswerKeyModal"
 
 import { QueryProvider } from "@/components/providers/QueryProvider"
 import {
@@ -13,7 +11,6 @@ import {
   ListOrdered,
   GraduationCap,
   Target,
-  Eye,
   Trophy,
   Info,
 } from "lucide-react"
@@ -44,7 +41,6 @@ interface LevelSelectorResponse {
 function LevelSelectorContent() {
   const { user } = useAuth()
   const PLATFORM_SLUG = import.meta.env.PUBLIC_PLATFORM_SLUG || "wildwisdom"
-  const [answerLevelId, setAnswerLevelId] = useState<number | null>(null)
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["studentLevels", PLATFORM_SLUG],
@@ -99,7 +95,7 @@ function LevelSelectorContent() {
 
   return (
     <div className="mx-auto space-y-12">
-      <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-slate-900 py-12 max-lg:px-5 md:py-16">
+      <div className="relative flex w-full flex-col items-center overflow-hidden bg-slate-900 py-16 max-lg:px-5 md:py-20">
         <OceanElement
           src={`${baseUrl}images/two-fish.webp`}
           type="fish"
@@ -189,66 +185,97 @@ function LevelSelectorContent() {
             <div className="mt-6 flex items-center justify-center">
               <a
                 href={`${baseUrl}student/guidelines`}
-                className="bg-ocean-deep flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-md transition-transform hover:scale-105 active:scale-95"
+                className="guidelines-blink relative flex items-center gap-2 rounded-xl bg-[#F78623] px-8 py-4 text-base font-black tracking-wide text-white uppercase shadow-lg transition-transform hover:scale-105 active:scale-95 md:text-lg"
               >
-                <Info size={18} />
-                View Challenge Guidelines
+                <span className="pointer-events-none absolute -inset-1 rounded-xl bg-[#F78623] opacity-40 blur-md" />
+                <Info size={20} className="relative z-10" />
+                <span className="relative z-10">View Challenge Guidelines</span>
               </a>
+            </div>
+
+            <div className="relative z-20 mt-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5 text-left shadow-md md:p-6">
+              <div className="mb-3 flex items-center justify-center gap-2 text-amber-900">
+                <ShieldAlert size={20} className="shrink-0" />
+                <h3 className="text-sm font-black tracking-wide uppercase md:text-base">
+                  Important Notice for Students
+                </h3>
+              </div>
+              <div className="space-y-3 text-sm leading-relaxed font-semibold text-amber-950 md:text-[15px]">
+                <p>
+                  This quiz platform is designed for WWGC participants to test
+                  and enhance your knowledge oceans.
+                </p>
+                <p>
+                  Therefore, please attempt all questions independently and do
+                  not use AI tools, search engines, or any other unfair means to
+                  obtain answers.
+                </p>
+                <p>
+                  Clearing this round using outside assistance may not help you
+                  in the subsequent rounds, which may use different formats and
+                  platforms. Your performance in later rounds will depend on
+                  your genuine understanding and ability.
+                </p>
+                <p className="border-t border-amber-300 pt-3 font-black text-(--wwf-ocean-deep)">
+                  Give it your best effort, play fair, and let your knowledge
+                  speak for itself.
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* STATUS AND PLAY BUTTONS */}
-          <div className="relative z-10 mt-8 border-t-2 border-slate-100 pt-8">
-            {isQuizComplete ? (
-              <div className="mx-auto w-full max-w-sm animate-in duration-700 fade-in slide-in-from-bottom-4">
-                <div className="flex flex-col items-center bg-white p-10 text-center sm:p-7">
-                  <div className="relative mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-(--wwf-coral)/5 ring-1 ring-(--wwf-coral)/20">
-                    <div className="absolute inset-2 rounded-full bg-(--wwf-coral)/10" />
-                    <Trophy
-                      className="relative z-10 h-10 w-10 text-(--wwf-coral)"
-                      strokeWidth={1.5}
-                    />
+          {/* STATUS AND PLAY BUTTONS — hidden for guests (no "Sign in to Play") */}
+          {user && (
+            <div className="relative z-10 mt-8 border-t-2 border-slate-100 pt-8">
+              {isQuizComplete ? (
+                <div className="mx-auto w-full max-w-sm animate-in duration-700 fade-in slide-in-from-bottom-4">
+                  <div className="flex flex-col items-center bg-white p-10 text-center sm:p-7">
+                    <div className="relative mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-(--wwf-coral)/5 ring-1 ring-(--wwf-coral)/20">
+                      <div className="absolute inset-2 rounded-full bg-(--wwf-coral)/10" />
+                      <Trophy
+                        className="relative z-10 h-10 w-10 text-(--wwf-coral)"
+                        strokeWidth={1.5}
+                      />
+                    </div>
+                    <h3 className="font-wwf text-4xl tracking-wide text-(--wwf-ocean-deep)">
+                      Quiz Completed!
+                    </h3>
                   </div>
-                  <h3 className="font-wwf text-4xl tracking-wide text-(--wwf-ocean-deep)">
-                    Quiz Completed!
+                </div>
+              ) : nextLevel ? (
+                <div className="flex flex-col items-center">
+                  {user?.role === "teacher" ||
+                  user?.role === "admin" ||
+                  user?.role === "state_admin" ? (
+                    <div className="flex w-full max-w-sm cursor-not-allowed flex-col items-center justify-center rounded-xl border-2 border-(--wwf-border) bg-slate-50 py-4 text-(--wwf-ocean)">
+                      <span className="flex items-center gap-2 text-sm font-black tracking-widest uppercase">
+                        <ShieldAlert size={16} /> Teacher View
+                      </span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() =>
+                        window.location.assign(
+                          `${import.meta.env.BASE_URL}play/game?levelId=${nextLevel.id}`
+                        )
+                      }
+                      className="btn-wwf-secondary group flex w-full max-w-lg items-center justify-center gap-4 rounded-2xl py-6 text-2xl font-black tracking-wide uppercase shadow-xl transition-all hover:scale-[1.03] active:scale-95 md:py-7 md:text-4xl"
+                    >
+                      Play Now
+                      <Play className="h-8 w-8 fill-current transition-transform md:h-10 md:w-10 group-hover:translate-x-1" />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <Lock className="mb-3 h-10 w-10 text-slate-400" />
+                  <h3 className="font-wwf text-xl text-slate-500">
+                    More Levels Coming Soon
                   </h3>
                 </div>
-              </div>
-            ) : nextLevel ? (
-              <div className="flex flex-col items-center">
-                {user?.role === "teacher" ||
-                user?.role === "admin" ||
-                user?.role === "state_admin" ? (
-                  <div className="flex w-full max-w-sm cursor-not-allowed flex-col items-center justify-center rounded-xl border-2 border-(--wwf-border) bg-slate-50 py-4 text-(--wwf-ocean)">
-                    <span className="flex items-center gap-2 text-sm font-black tracking-widest uppercase">
-                      <ShieldAlert size={16} /> Teacher View
-                    </span>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() =>
-                      window.location.assign(
-                        user
-                          ? `${import.meta.env.BASE_URL}play/game?levelId=${nextLevel.id}`
-                          : `${import.meta.env.BASE_URL}login`
-                      )
-                    }
-                    className="btn-wwf-secondary group flex w-full max-w-sm items-center justify-center gap-3 rounded-2xl py-4 text-xl font-black transition-all hover:scale-[1.02] active:scale-95"
-                  >
-                    {user ? "Play Now" : "Sign in to Play"}
-                    <Play className="h-6 w-6 fill-current transition-transform group-hover:translate-x-1" />
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center">
-                <Lock className="mb-3 h-10 w-10 text-slate-400" />
-                <h3 className="font-wwf text-xl text-slate-500">
-                  More Levels Coming Soon
-                </h3>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -340,14 +367,6 @@ function LevelSelectorContent() {
                           <CheckCircle2 size={16} />
                           Completed
                         </span>
-
-                        <button
-                          onClick={() => setAnswerLevelId(level.id)}
-                          className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-bold text-(--wwf-ocean-deep) ring-1 ring-(--wwf-ocean-deep)/15 hover:bg-slate-50"
-                        >
-                          <Eye size={16} />
-                          Answers
-                        </button>
                       </div>
                     ) : isCurrent ? (
                       user?.role === "teacher" ||
@@ -365,9 +384,9 @@ function LevelSelectorContent() {
                                 : `${import.meta.env.BASE_URL}login`
                             )
                           }
-                          className="btn-wwf-primary flex w-full items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold shadow-md sm:w-auto"
+                          className="btn-wwf-primary flex w-full items-center justify-center gap-2 rounded-xl px-7 py-3.5 text-base font-black shadow-md sm:w-auto md:text-lg"
                         >
-                          Play Now <Play size={14} className="fill-current" />
+                          Play Now <Play size={18} className="fill-current" />
                         </button>
                       )
                     ) : (
@@ -384,12 +403,6 @@ function LevelSelectorContent() {
           </div>
         </div>
       )}
-
-      <AnswerKeyModal
-        levelId={answerLevelId}
-        open={answerLevelId !== null}
-        onClose={() => setAnswerLevelId(null)}
-      />
     </div>
   )
 }

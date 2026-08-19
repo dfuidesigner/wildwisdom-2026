@@ -9,10 +9,10 @@ export interface SchoolSummary {
 export interface User {
   id: number
   name: string
-  email: string
+  email: string | null
   role: "admin" | "teacher" | "student" | "state_admin"
   school_id: number
-  phone_number: string
+  phone_number: string | null
   grade?: string
   created_at: string
   updated_at: string
@@ -33,7 +33,7 @@ export interface StudentRegisterResponse {
   user: {
     id: number
     name: string
-    email: string
+    email: string | null
     role: string
   }
 }

@@ -12,11 +12,10 @@ import type { ValidationErrorResponse } from "@/types/api"
 import { encryptPayload } from "@/lib/encryption"
 
 const loginSchema = z.object({
-  email: z
+  login_id: z
     .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address")
-    .max(255, "Email is too long")
+    .min(1, "Email or phone number is required")
+    .max(255, "Input is too long")
     .regex(/^[^<>]*$/, "Invalid characters detected"),
   password: z
     .string()
@@ -35,7 +34,7 @@ function LoginFormComponent() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { login_id: "", password: "" },
   })
 
   const loginMutation = useMutation<
@@ -96,7 +95,7 @@ function LoginFormComponent() {
       const encryptedPassword = await encryptPayload(data.password)
 
       loginMutation.mutate({
-        email: data.email,
+        login_id: data.login_id.trim(),
         password: encryptedPassword,
       })
     } catch (e) {
@@ -113,26 +112,27 @@ function LoginFormComponent() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
         <div className="space-y-1.5">
           <label
-            htmlFor="email"
+            htmlFor="login_id"
             className="ml-1 text-xs font-black tracking-widest text-(--wwf-ocean-light) uppercase"
           >
-            Email Address
+            Email or Phone Number
           </label>
           <input
-            id="email"
-            type="email"
-            placeholder="explorer@wildlife.com"
+            id="login_id"
+            type="text"
+            placeholder="you@example.com or 9876543210"
+            autoComplete="username"
             disabled={loginMutation.isPending}
-            {...register("email")}
+            {...register("login_id")}
             className={`flex h-12 w-full rounded-xl border-2 bg-(--wwf-white) px-4 py-2 text-sm font-medium text-(--wwf-ocean-deep) transition-all focus:ring-4 focus:ring-(--wwf-sea-green)/20 focus:outline-none disabled:opacity-50 ${
-              errors.email
+              errors.login_id
                 ? "border-red-200 focus:border-red-500"
                 : "border-(--wwf-border) focus:border-(--wwf-sea-green)"
             }`}
           />
-          {errors.email && (
+          {errors.login_id && (
             <p className="ml-1 text-xs font-bold text-red-500">
-              {errors.email.message}
+              {errors.login_id.message}
             </p>
           )}
         </div>
@@ -150,6 +150,7 @@ function LoginFormComponent() {
             id="password"
             type="password"
             placeholder="••••••••"
+            autoComplete="current-password"
             disabled={loginMutation.isPending}
             {...register("password")}
             className={`flex h-12 w-full rounded-xl border-2 bg-(--wwf-white) px-4 py-2 text-sm font-medium text-(--wwf-ocean-deep) transition-all focus:ring-4 focus:ring-(--wwf-sea-green)/20 focus:outline-none disabled:opacity-50 ${

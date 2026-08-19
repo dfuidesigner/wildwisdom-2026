@@ -13,7 +13,6 @@ import {
   Ghost,
   Clock,
   CalendarDays,
-  Eye,
 } from "lucide-react"
 
 import {
@@ -25,7 +24,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AnswerKeyModal } from "@/components/play/AnswerKeyModal"
 
 interface UserRef {
   id: number
@@ -70,7 +68,6 @@ function LeaderboardContent() {
     new URLSearchParams(window.location.search).get("levelId")
   )
   const PLATFORM_SLUG = import.meta.env.PUBLIC_PLATFORM_SLUG || "wildwisdom"
-  const [showAnswers, setShowAnswers] = useState(false)
 
   const [successMsg] = useState(() => {
     const params = new URLSearchParams(window.location.search)
@@ -226,13 +223,6 @@ function LeaderboardContent() {
                 strokeWidth={3}
                 className="transition-transform group-hover:translate-x-1"
               />
-            </button>
-
-            <button
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-white px-8 py-4 font-wwf text-xl tracking-widest text-[#003140] shadow-lg transition-all hover:scale-105 md:w-auto"
-              onClick={() => setShowAnswers(true)}
-            >
-              VIEW ANSWERS <Eye size={20} strokeWidth={3} />
             </button>
           </div>
 
@@ -515,12 +505,6 @@ function LeaderboardContent() {
           </Table>
         </div>
       </div>
-
-      <AnswerKeyModal
-        levelId={levelId}
-        open={showAnswers}
-        onClose={() => setShowAnswers(false)}
-      />
     </div>
   )
 }

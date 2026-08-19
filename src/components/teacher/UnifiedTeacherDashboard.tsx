@@ -22,6 +22,7 @@ import {
   Map,
   Clock,
   Phone,
+  ShieldAlert,
 } from "lucide-react"
 import type { PaginatedStudents, Stats } from "@/types/teacher"
 import type { School } from "@/types/school"
@@ -271,6 +272,23 @@ function DashboardContent() {
             )}
           </div>
         </div>
+      </section>
+
+      <section className="relative z-10 rounded-[2rem] border-2 border-amber-300 bg-amber-50 p-6 shadow-md sm:p-8">
+        <div className="mb-3 flex items-center gap-2 text-amber-900">
+          <ShieldAlert size={22} className="shrink-0" />
+          <h3 className="text-base font-black tracking-wide uppercase md:text-lg">
+            Disclaimer
+          </h3>
+        </div>
+        <p className="text-sm leading-relaxed font-semibold text-amber-950 md:text-base">
+          Dear teachers, your students may be able to clear the Classroom
+          Challenge round using AI tools, however, they will not be able to
+          perform as well in subsequent rounds, since those rounds use different
+          formats and platforms. We therefore request that you ensure students
+          complete the quizzes without resorting to unfair means, so that the
+          most capable students genuinely qualify for the next round.
+        </p>
       </section>
 
       {/* 3. Key Metrics Grid */}

@@ -11,11 +11,10 @@ import type { LoginResponse } from "@/types/auth"
 import { encryptPayload } from "@/lib/encryption"
 
 const loginSchema = z.object({
-  email: z
+  login_id: z
     .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address")
-    .max(255, "Email is too long")
+    .min(1, "Email or phone number is required")
+    .max(255, "Email or phone is too long")
     .regex(/^[^<>]*$/, "Invalid characters detected"),
   password: z
     .string()
@@ -58,7 +57,7 @@ function TeacherLoginFormComponent() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { login_id: "", password: "" },
   })
 
   const loginMutation = useMutation<
@@ -87,7 +86,10 @@ function TeacherLoginFormComponent() {
       }
     },
     onError: (error) => {
-      const message = getErrorMessage(error, "Invalid email or school code.")
+      const message = getErrorMessage(
+        error,
+        "Invalid email/phone or school code."
+      )
       toast.error("Authentication Failed", { description: message })
     },
   })
@@ -99,7 +101,7 @@ function TeacherLoginFormComponent() {
       const encryptedPassword = await encryptPayload(data.password)
 
       const payload: LoginPayload = {
-        email: data.email,
+        login_id: data.login_id.trim(),
         password: encryptedPassword,
       }
 
@@ -116,29 +118,29 @@ function TeacherLoginFormComponent() {
   return (
     <div className="w-full">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
-        {/* FACULTY EMAIL */}
         <div className="space-y-2">
           <label
-            htmlFor="email"
+            htmlFor="login_id"
             className="ml-1 text-xs font-black tracking-widest text-(--wwf-ocean) uppercase"
           >
-            Teacher Email
+            Teacher Email or Phone
           </label>
           <input
-            id="email"
-            type="email"
+            id="login_id"
+            type="text"
             placeholder="educator@school.edu"
+            autoComplete="username"
             disabled={loginMutation.isPending}
-            {...register("email")}
+            {...register("login_id")}
             className={`flex h-14 w-full rounded-2xl border-2 bg-slate-50/50 px-4 py-2 text-base font-medium text-(--wwf-ocean-deep) transition-all placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-(--wwf-ocean)/20 focus:outline-none disabled:opacity-50 ${
-              errors.email
+              errors.login_id
                 ? "border-red-200 focus:border-red-500"
                 : "border-slate-200 hover:border-(--wwf-ocean-light)/50 focus:border-(--wwf-ocean)"
             }`}
           />
-          {errors.email && (
+          {errors.login_id && (
             <p className="ml-1 text-xs font-bold text-red-500">
-              {errors.email.message}
+              {errors.login_id.message}
             </p>
           )}
         </div>
@@ -178,7 +180,6 @@ function TeacherLoginFormComponent() {
           </div>
         )}
 
-        {/* SUBMIT BUTTON */}
         <button
           type="submit"
           disabled={loginMutation.isPending}
