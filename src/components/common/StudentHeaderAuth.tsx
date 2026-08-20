@@ -17,16 +17,23 @@ function StudentHeaderAuthContent() {
       <div className="flex items-center gap-2 font-wwf tracking-wider sm:gap-4">
         <a
           href={`${import.meta.env.BASE_URL}login`}
-          className="flex items-center gap-2 rounded-full px-4 py-2.5 text-xl transition-all hover:bg-slate-100 hover:text-(--wwf-ocean-deep) active:scale-95 max-[480px]:text-sm"
+          className="group relative flex items-center gap-2 overflow-hidden rounded-full border border-(--wwf-ocean-light)/25 bg-(--wwf-ocean-deep)/5 px-4 py-2.5 text-xl font-medium text-(--wwf-ocean-deep) shadow-sm transition-all hover:-translate-y-0.5 hover:border-(--wwf-ocean)/40 hover:bg-(--wwf-ocean-deep) hover:text-white hover:shadow-[0_0_18px_rgba(0,120,160,0.25)] active:scale-95 max-[480px]:text-sm"
         >
-          <LogIn size={16} /> Login
+          <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+
+          <LogIn
+            size={16}
+            className="relative transition-transform duration-300 group-hover:translate-x-0.5"
+          />
+
+          <span className="relative">Login</span>
         </a>
-        <a
+        {/* <a
           href={`${import.meta.env.BASE_URL}register/student`}
           className="flex items-center gap-2 rounded-full bg-(--wwf-coral) px-3 py-1.5 text-xl text-white shadow-sm transition-all hover:bg-(--wwf-orange) hover:shadow-(--wwf-coral)/20 active:scale-95 max-[480px]:text-sm"
         >
           <UserPlus size={16} /> Register Here
-        </a>
+        </a> */}
       </div>
     )
   }

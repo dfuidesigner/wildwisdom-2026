@@ -195,7 +195,7 @@ function LeaderboardContent() {
                 </h3>
                 <p className="text-base font-medium text-[#95DDEA]">
                   {successMsg.completed
-                    ? "You have completed all four quiz levels of the Classroom Challenge."
+                    ? "Results to be declared on 22nd september so all the answers will be revealed on that day itself"
                     : "You have completed the quiz level and are now eligible to access the next quiz."}
                 </p>
                 <p className="mt-1 text-sm font-bold text-white">

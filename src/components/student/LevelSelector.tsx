@@ -179,7 +179,7 @@ function LevelSelectorContent() {
             </p>
             <p className="mb-5 text-sm leading-relaxed font-medium text-slate-600 md:text-base lg:text-lg">
               The challenge is open to all registered students and will be
-              hosted entirely online through the WWF-India WWGC portal.
+              hosted entirely online through the Wild Wisdom Quiz Platform.
             </p>
 
             <div className="mt-6 flex items-center justify-center">
@@ -193,7 +193,7 @@ function LevelSelectorContent() {
               </a>
             </div>
 
-            <div className="relative z-20 mt-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5 text-left shadow-md md:p-6">
+            {/* <div className="relative z-20 mt-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5 text-left shadow-md md:p-6">
               <div className="mb-3 flex items-center justify-center gap-2 text-amber-900">
                 <ShieldAlert size={20} className="shrink-0" />
                 <h3 className="text-sm font-black tracking-wide uppercase md:text-base">
@@ -202,8 +202,8 @@ function LevelSelectorContent() {
               </div>
               <div className="space-y-3 text-sm leading-relaxed font-semibold text-amber-950 md:text-[15px]">
                 <p>
-                  This quiz platform is designed for WWGC participants to test
-                  and enhance your knowledge oceans.
+                  This quiz platform is designed for WWGC participants to Test
+                  and enhance their knowledge on Oceans.
                 </p>
                 <p>
                   Therefore, please attempt all questions independently and do
@@ -221,7 +221,75 @@ function LevelSelectorContent() {
                   speak for itself.
                 </p>
               </div>
-            </div>
+            </div> */}
+
+            {!user ? (
+              <div className="relative z-20 mt-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5 text-left shadow-md md:p-6">
+                <div className="mb-3 flex items-center justify-center gap-2 text-amber-900">
+                  <ShieldAlert size={20} className="shrink-0" />
+                  <h3 className="text-sm font-black tracking-wide uppercase md:text-base">
+                    Important Notice for Students
+                  </h3>
+                </div>
+
+                <div className="space-y-3 text-sm leading-relaxed font-semibold text-amber-950 md:text-[15px]">
+                  <p>
+                    This quiz platform is designed for WWGC participants to Test
+                    and enhance their knowledge on Oceans.
+                  </p>
+                  <p>
+                    Therefore, please attempt all questions independently and do
+                    not use AI tools, search engines, or any other unfair means
+                    to obtain answers.
+                  </p>
+                  <p>
+                    Clearing this round using outside assistance may not help
+                    you in the subsequent rounds, which may use different
+                    formats and platforms. Your performance in later rounds will
+                    depend on your genuine understanding and ability.
+                  </p>
+                  <p className="border-t border-amber-300 pt-3 font-black text-(--wwf-ocean-deep)">
+                    Give it your best effort, play fair, and let your knowledge
+                    speak for itself.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="relative z-20 mt-6 rounded-2xl border-2 border-amber-200 bg-amber-50/80 p-6 text-left shadow-md">
+                <div className="mb-3 flex items-center gap-2 text-amber-800">
+                  <ShieldAlert size={22} className="shrink-0" />
+                  <h3 className="text-base font-bold tracking-wide uppercase">
+                    Disclaimer
+                  </h3>
+                </div>
+
+                <div className="space-y-3 text-sm leading-relaxed font-semibold text-amber-900">
+                  <p>
+                    The quiz platform actively monitors browser activity
+                    throughout the session.
+                  </p>
+
+                  <p className="font-bold">
+                    Switching tabs, minimizing the browser window, or navigating
+                    away from the quiz page may result in the quiz being
+                    automatically submitted, and your one attempt will be
+                    considered complete.
+                  </p>
+
+                  <p>
+                    Students will not be given a second attempt for the same
+                    quiz under any circumstances. Each quiz level must be
+                    completed in a single attempt.
+                  </p>
+
+                  <p className="border-t border-amber-300 pt-2 font-bold text-(--wwf-ocean-deep)">
+                    Students are strongly advised to remain on the quiz page
+                    throughout the session to ensure a smooth and uninterrupted
+                    experience.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* STATUS AND PLAY BUTTONS — hidden for guests (no "Sign in to Play") */}
@@ -240,6 +308,10 @@ function LevelSelectorContent() {
                     <h3 className="font-wwf text-4xl tracking-wide text-(--wwf-ocean-deep)">
                       Quiz Completed!
                     </h3>
+                    <p className="mt-3">
+                      Results to be declared on 22nd september so all the
+                      answers will be revealed on that day itself
+                    </p>
                   </div>
                 </div>
               ) : nextLevel ? (

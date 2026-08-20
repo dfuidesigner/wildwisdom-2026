@@ -20,8 +20,8 @@ function StudentNavigationContent({ currentPath, base }: Props) {
         href={`${base}/`}
         className="text- hidden items-center gap-2 rounded-xl px-4 py-2 font-wwf font-normal tracking-wider transition-all hover:bg-slate-100 hover:text-(--wwf-ocean-deep) lg:flex lg:text-xl"
       >
-        <ArrowLeft size={16} strokeWidth={2} /> Wild Wisdom Global Challenge
-        2026
+        <ArrowLeft size={16} strokeWidth={2} /> WWF-India’s Wild Wisdom Global
+        Challenge 2026
       </a>
 
       {!isLoading && user && user.role === "student" && (

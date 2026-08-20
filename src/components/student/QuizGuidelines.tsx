@@ -63,13 +63,13 @@ export function QuizGuidelines() {
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <a
+            {/* <a
               href={`${baseUrl}register/student`}
               className="guidelines-blink inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#F78623] px-5 py-2.5 text-sm font-black tracking-wide text-white uppercase shadow-md transition-all hover:bg-[#e07518] active:scale-95"
             >
               <UserPlus size={16} />
               Register Now
-            </a>
+            </a> */}
             <a
               href={`${baseUrl}play/levels`}
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-(--wwf-ocean-deep) shadow-sm transition-all hover:bg-slate-50 active:scale-95"
@@ -295,8 +295,8 @@ export function QuizGuidelines() {
           </div>
           <div className="space-y-3 text-sm leading-relaxed font-semibold text-amber-950 md:text-base">
             <p>
-              This quiz platform is designed for WWGC participants to test and
-              enhance your knowledge oceans.
+              This quiz platform is designed for WWGC participants to Test and
+              enhance their knowledge on Oceans.
             </p>
             <p>
               Therefore, please attempt all questions independently and do not
@@ -349,8 +349,8 @@ export function QuizGuidelines() {
                 },
                 {
                   step: "3",
-                  title: "Verify Your Email",
-                  desc: "An OTP will be sent to your authentic mobile number. Enter the OTP to complete the registration and verification process.",
+                  title: "Verify Your Email / Mobile",
+                  desc: "An OTP will be sent to your authentic mobile number or email ID. Enter the OTP to complete the registration and verification process.",
                 },
                 {
                   step: "4",
@@ -455,12 +455,12 @@ export function QuizGuidelines() {
                   Disclaimer
                 </h3>
               </div>
-              <div className="space-y-3 text-sm leading-relaxed font-semibold text-amber-900">
+              <div className="space-y-3 text-sm leading-relaxed font-semibold text-amber-900 ">
                 <p>
                   The quiz platform actively monitors browser activity
                   throughout the session.
                 </p>
-                <p>
+                <p className="font-bold">
                   Switching tabs, minimizing the browser window, or navigating
                   away from the quiz page may result in the quiz being
                   automatically submitted, and your one attempt will be
@@ -483,14 +483,14 @@ export function QuizGuidelines() {
             <div className="flex flex-col gap-3 pt-2">
               <a
                 href={`${baseUrl}register/student`}
-                className="guidelines-blink flex w-full items-center justify-center gap-2 rounded-2xl bg-[#F78623] py-4 font-black tracking-wide text-white uppercase shadow-md transition-all hover:bg-[#e07518] hover:shadow-lg active:scale-95"
+                className="guidelines-blink text-xl flex w-full items-center justify-center gap-2 rounded-2xl bg-[#F78623] py-4 font-black tracking-wide text-white uppercase shadow-md transition-all hover:bg-[#e07518] hover:shadow-lg active:scale-95"
               >
                 <UserPlus size={18} />
                 Register Now
               </a>
               <a
-                href={`${baseUrl}play/levels`}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-(--wwf-ocean-deep) py-4 font-bold text-white shadow-md transition-all hover:bg-slate-800 hover:shadow-lg active:scale-95"
+                href={`${baseUrl}login`}
+                className="flex w-full text-xl items-center justify-center gap-2 rounded-2xl bg-(--wwf-ocean-deep) py-4 font-bold text-white shadow-md transition-all hover:bg-slate-800 hover:shadow-lg active:scale-95"
               >
                 Ready to Play?
               </a>
