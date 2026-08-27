@@ -622,7 +622,7 @@ function StudentRegistrationFormComponent() {
       {/* Security */}
       <fieldset className="pt-4">
         <legend className="text-2xl font-bold text-(--wwf-ocean-deep)">
-          Security
+          Password
         </legend>
 
         <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">

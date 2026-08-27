@@ -47,6 +47,7 @@
 // export default api
 
 import axios from "axios"
+import { toast } from "sonner"
 
 export const api = axios.create({
   // baseURL: "http://localhost:8000/api/v2",
@@ -87,6 +88,14 @@ api.interceptors.response.use(
         }
       }
     }
+
+    if (error.response?.status === 429) {
+      toast.error("Whoa, slow down!", {
+        description:
+          "You've made too many requests. Please wait 1 minute before trying again.",
+      })
+    }
+
     return Promise.reject(error)
   }
 )

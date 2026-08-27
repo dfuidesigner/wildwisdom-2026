@@ -292,7 +292,7 @@ function DashboardContent() {
       </section>
 
       {/* 3. Key Metrics Grid */}
-      <section className="relative z-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="relative z-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {/* Access Code Card */}
         <div className="group flex flex-col justify-between rounded-[2rem] border-2 border-(--wwf-ocean)/10 bg-linear-to-br from-(--wwf-ocean)/5 to-white/60 p-6 shadow-md backdrop-blur-xl transition-all hover:border-(--wwf-ocean)/30 hover:shadow-lg">
           <div className="mb-6 flex items-center justify-between">
@@ -321,6 +321,33 @@ function DashboardContent() {
             )}
             <p className="mt-3 text-sm font-semibold text-(--wwf-ocean-deep)/60">
               Share this code with students to join
+            </p>
+          </div>
+        </div>
+
+        {/* Expected Students */}
+        <div className="flex flex-col justify-between rounded-[2rem] border border-(--wwf-ocean-light)/10 bg-white/90 p-6 shadow-md backdrop-blur-xl">
+          <div className="mb-6 flex items-center justify-between">
+            <span className="text-xs font-bold tracking-widest text-(--wwf-ocean-light)/70 uppercase">
+              Expected Students
+            </span>
+
+            <div className="rounded-xl bg-linear-to-br from-(--wwf-ocean-light)/5 to-(--wwf-ocean-light)/10 p-2.5 text-(--wwf-ocean-deep) shadow-xs">
+              <Users size={20} />
+            </div>
+          </div>
+
+          <div>
+            {isLoadingSchool ? (
+              <Skeleton className="h-12 w-20 bg-(--wwf-ocean)/10" />
+            ) : (
+              <div className="font-wwf text-5xl tracking-wider text-(--wwf-ocean-deep) md:text-6xl">
+                {school?.school_expected_students || 0}
+              </div>
+            )}
+
+            <p className="mt-3 text-sm font-semibold text-(--wwf-ocean-light)/60">
+              Expected number of students
             </p>
           </div>
         </div>

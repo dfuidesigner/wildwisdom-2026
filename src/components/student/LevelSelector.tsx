@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react"
 import { useQuery } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { useAuth } from "@/hooks/useAuth"
@@ -13,9 +14,22 @@ import {
   Target,
   Trophy,
   Info,
+  PartyPopper,
+  CalendarDays,
+  Users,
+  Eye,
+  Clock,
+  Waves,
 } from "lucide-react"
 import OceanElement from "../home/OceanElement"
 const baseUrl = import.meta.env.BASE_URL
+
+const formatTime = (seconds?: number | null) => {
+  if (seconds === null || seconds === undefined) return null
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return m > 0 ? `${m}m ${s}s` : `${s}s`
+}
 
 interface Level {
   id: number
@@ -24,6 +38,7 @@ interface Level {
   time_limit: number | null
   is_completed: boolean
   score: number | null
+  time_taken: number | null
   completed_at: string | null
   is_locked: boolean
   unlocks_at: string | null
@@ -36,6 +51,204 @@ interface LevelSelectorResponse {
     description: string | null
   }
   levels: Level[]
+}
+
+/* -------------------------------------------------------------------- */
+/* Blink keyframes (scoped, no tailwind.config / global css edit needed) */
+/* -------------------------------------------------------------------- */
+const BlinkStyles = () => (
+  <style>{`
+    /* Light-sweep across the text. The text NEVER goes transparent:
+       the gradient tiles (repeat) so every letter is always painted,
+       and a solid color fallback sits underneath.
+       Colours come from --shine-base / --shine-hi per instance. */
+    @keyframes wwfShine {
+      from { background-position: 0% 0; }
+      to   { background-position: -162.5% 0; }
+    }
+    @keyframes wwfBreathe {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.02); }
+    }
+    .wwf-blink {
+      display: inline-block;
+      color: var(--shine-base);
+      animation: wwfBreathe 3.4s ease-in-out infinite;
+    }
+    @supports ((background-clip: text) or (-webkit-background-clip: text)) {
+      .wwf-blink {
+        background-image: linear-gradient(
+          100deg,
+          var(--shine-base) 0%,
+          var(--shine-base) 42%,
+          var(--shine-hi) 50%,
+          var(--shine-base) 58%,
+          var(--shine-base) 100%
+        );
+        background-size: 260% 100%;
+        background-repeat: repeat;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation:
+          wwfShine 3.4s linear infinite,
+          wwfBreathe 3.4s ease-in-out infinite;
+        will-change: background-position, transform;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .wwf-blink {
+        animation: none;
+        background-image: none;
+        color: var(--shine-base);
+        -webkit-text-fill-color: var(--shine-base);
+      }
+    }
+  `}</style>
+)
+
+/* -------------------------------------------------------------------- */
+/* ALL LEVELS CLEARED — completion message (light card variant)          */
+/* -------------------------------------------------------------------- */
+function QuizCompletedMessage({
+  totalScore,
+  totalTime,
+}: {
+  totalScore?: number | null
+  totalTime?: number | null
+}) {
+  return (
+    <div className="relative w-full overflow-hidden rounded-[2rem] border-2 border-(--wwf-border) bg-white p-6 text-center shadow-lg md:p-8">
+      <BlinkStyles />
+
+      {/* soft glows */}
+      <div className="pointer-events-none absolute -top-16 -right-16 h-56 w-56 rounded-full bg-(--wwf-coral)/10 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-(--wwf-sea-green)/10 blur-3xl" />
+
+      <div className="relative z-10 flex flex-col items-center">
+        <div className="relative mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--wwf-coral)/10 ring-1 ring-(--wwf-coral)/25">
+          <div className="absolute inset-2 rounded-full bg-(--wwf-coral)/10" />
+          <Trophy
+            className="relative z-10 h-8 w-8 text-(--wwf-coral)"
+            strokeWidth={1.5}
+            fill="currentColor"
+          />
+        </div>
+
+        <span className="mb-3 inline-flex items-center gap-2 rounded-full border-2 border-(--wwf-border) bg-white px-4 py-1.5 text-[10px] font-black tracking-[0.2em] text-(--wwf-ocean-deep) uppercase shadow-sm md:text-xs">
+          <PartyPopper size={12} className="text-(--wwf-coral)" />
+          All 4 Quizzes Complete
+        </span>
+
+        <h3
+          className="wwf-blink font-wwf text-3xl tracking-widest text-(--wwf-ocean-deep) md:text-4xl lg:text-5xl"
+          style={
+            {
+              "--shine-base": "var(--wwf-ocean-deep)",
+              "--shine-hi": "var(--wwf-coral)",
+            } as CSSProperties
+          }
+        >
+          CONGRATULATIONS!
+        </h3>
+
+        <p className="mt-3 max-w-2xl text-base leading-relaxed font-semibold text-slate-700 md:text-lg">
+          You have successfully completed all four challenge quizzes!
+        </p>
+
+        {typeof totalScore === "number" && (
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <div className="inline-flex items-center gap-2.5 rounded-2xl border-2 border-(--wwf-coral)/30 bg-(--wwf-coral)/5 px-5 py-3">
+              <Target size={18} className="text-(--wwf-coral)" />
+              <span className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+                Total Score
+              </span>
+              <span className="font-wwf text-2xl tracking-widest text-(--wwf-coral) md:text-3xl">
+                {totalScore}
+              </span>
+            </div>
+            {formatTime(totalTime) && (
+              <div className="inline-flex items-center gap-2.5 rounded-2xl border-2 border-(--wwf-sea-green)/30 bg-(--wwf-sea-green)/5 px-5 py-3">
+                <Clock size={18} className="text-(--wwf-sea-green)" />
+                <span className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+                  Total Time Taken
+                </span>
+                <span className="font-wwf text-2xl tracking-widest text-(--wwf-deep-ocean) md:text-3xl">
+                  {formatTime(totalTime)}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Info cards */}
+      <div className="relative z-10 mt-8 grid gap-4 text-left md:grid-cols-3">
+        <div className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5">
+          <div className="mb-2 flex items-center gap-2 text-(--wwf-coral)">
+            <CalendarDays size={15} />
+            <span className="text-[10px] font-black tracking-[0.2em] uppercase">
+              Results
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed font-medium text-slate-700 md:text-base">
+            The results will be declared on{" "}
+            <strong className="text-(--wwf-ocean-deep)">
+              22nd September 2026
+            </strong>
+            .
+          </p>
+        </div>
+
+        <div className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5">
+          <div className="mb-2 flex items-center gap-2 text-(--wwf-coral)">
+            <Users size={15} />
+            <span className="text-[10px] font-black tracking-[0.2em] uppercase">
+              Teacher Dashboard
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed font-medium text-slate-700 md:text-base">
+            The top two scorers will also be reflected on the Teacher Dashboard
+            once the quiz window closes on{" "}
+            <strong className="text-(--wwf-ocean-deep)">
+              20th September 2026
+            </strong>
+            .
+          </p>
+        </div>
+
+        <div className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5">
+          <div className="mb-2 flex items-center gap-2 text-(--wwf-coral)">
+            <Eye size={15} />
+            <span className="text-[10px] font-black tracking-[0.2em] uppercase">
+              Answer Key
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed font-medium text-slate-700 md:text-base">
+            Please note that the answers to all the questions will be revealed
+            on the Students’ Dashboard on the same day.
+          </p>
+        </div>
+      </div>
+
+      {/* Closing note */}
+      <div className="relative z-10 mt-6 flex flex-col items-center gap-3 rounded-2xl border-2 border-(--wwf-border) bg-(--wwf-sea-green)/5 p-5 md:flex-row md:p-6 md:text-left">
+        <Waves
+          size={20}
+          className="hidden shrink-0 text-(--wwf-sea-green) md:block"
+        />
+        <div>
+          <p className="text-sm leading-relaxed font-medium text-slate-700 md:text-base">
+            Until then, keep learning, keep exploring, and continue to dive deep
+            into the amazing world of oceans!
+          </p>
+          <p className="mt-2 font-wwf text-xl tracking-widest text-(--wwf-coral) md:text-2xl">
+            GOOD LUCK!
+          </p>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function LevelSelectorContent() {
@@ -92,6 +305,9 @@ function LevelSelectorContent() {
   const nextLevel = levels.find((l) => !l.is_completed && !l.is_locked)
   const isQuizComplete =
     levels.length > 0 && levels.every((l) => l.is_completed)
+
+  const totalScore = levels.reduce((sum, l) => sum + (l.score ?? 0), 0)
+  const totalTime = levels.reduce((sum, l) => sum + (l.time_taken ?? 0), 0)
 
   return (
     <div className="mx-auto space-y-12">
@@ -296,23 +512,11 @@ function LevelSelectorContent() {
           {user && (
             <div className="relative z-10 mt-8 border-t-2 border-slate-100 pt-8">
               {isQuizComplete ? (
-                <div className="mx-auto w-full max-w-sm animate-in duration-700 fade-in slide-in-from-bottom-4">
-                  <div className="flex flex-col items-center bg-white p-10 text-center sm:p-7">
-                    <div className="relative mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-(--wwf-coral)/5 ring-1 ring-(--wwf-coral)/20">
-                      <div className="absolute inset-2 rounded-full bg-(--wwf-coral)/10" />
-                      <Trophy
-                        className="relative z-10 h-10 w-10 text-(--wwf-coral)"
-                        strokeWidth={1.5}
-                      />
-                    </div>
-                    <h3 className="font-wwf text-4xl tracking-wide text-(--wwf-ocean-deep)">
-                      Quiz Completed!
-                    </h3>
-                    <p className="mt-3">
-                      Results to be declared on 22nd september so all the
-                      answers will be revealed on that day itself
-                    </p>
-                  </div>
+                <div className="mx-auto w-full animate-in duration-700 fade-in slide-in-from-bottom-4">
+                  <QuizCompletedMessage
+                    totalScore={totalScore}
+                    totalTime={totalTime}
+                  />
                 </div>
               ) : nextLevel ? (
                 <div className="flex flex-col items-center">

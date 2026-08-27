@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { useAuth } from "@/hooks/useAuth"
@@ -10,6 +10,7 @@ import {
   UserCheck,
   ChevronLeft,
   ChevronRight,
+  Search,
 } from "lucide-react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -28,6 +29,21 @@ function AdminDashboardContent() {
   const [schoolFilter, setSchoolFilter] = useState<string>("")
   const [topFilter, setTopFilter] = useState<number | "all">("all")
   const [page, setPage] = useState(1)
+
+  const [searchInput, setSearchInput] = useState("")
+  const [search, setSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
+
+  // debounce the search box
+  useEffect(() => {
+    const timer = setTimeout(() => setSearch(searchInput.trim()), 400)
+    return () => clearTimeout(timer)
+  }, [searchInput])
+
+  // reset to page 1 whenever a filter changes
+  useEffect(() => {
+    setPage(1)
+  }, [search, schoolFilter, statusFilter, topFilter])
 
   const PLATFORM_SLUG = import.meta.env.PUBLIC_PLATFORM_SLUG || "wildwisdom"
 
@@ -66,13 +82,21 @@ function AdminDashboardContent() {
   const { data: paginationData, isLoading: loadingStudents } = useQuery<
     PaginatedStudents<AdminStudent>
   >({
-    queryKey: ["adminStudents", page, schoolFilter, topFilter, PLATFORM_SLUG],
+    queryKey: [
+      "adminStudents",
+      page,
+      schoolFilter,
+      topFilter,
+      statusFilter,
+      search,
+      PLATFORM_SLUG,
+    ],
     queryFn: async () => {
       const params = new URLSearchParams()
 
-      if (schoolFilter) {
-        params.append("school_id", schoolFilter)
-      }
+      if (schoolFilter) params.append("school_id", schoolFilter)
+      if (statusFilter !== "all") params.append("status", statusFilter)
+      if (search) params.append("search", search)
 
       if (topFilter !== "all") {
         params.append("top", topFilter.toString())
@@ -83,7 +107,6 @@ function AdminDashboardContent() {
       const response = await api.get(
         `/admin/${PLATFORM_SLUG}/students?${params.toString()}`
       )
-
       return response.data.data
     },
   })
@@ -215,7 +238,35 @@ function AdminDashboardContent() {
           </TabsList>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            {/* Top N Filter */}
+            <div className="relative w-full sm:w-56">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-(--wwf-ocean)">
+                <Search size={16} />
+              </div>
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search students..."
+                className="h-12 w-full rounded-xl border border-(--wwf-ocean-light)/20 bg-[#F8FAFC] pr-4 pl-11 text-sm font-bold text-(--wwf-ocean-deep) shadow-sm transition-all outline-none focus:border-(--wwf-ocean) focus:bg-white"
+              />
+            </div>
+
+            {/* NEW: Status filter */}
+            <div className="relative w-full sm:w-44">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-(--wwf-ocean)">
+                <UserCheck size={16} />
+              </div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="h-12 w-full appearance-none rounded-xl border border-(--wwf-ocean-light)/20 bg-[#F8FAFC] pr-4 pl-11 text-sm font-bold text-(--wwf-ocean-deep) shadow-sm transition-all outline-none focus:border-(--wwf-ocean) focus:bg-white"
+              >
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
             <div className="relative w-full sm:w-40">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-(--wwf-ocean)">
                 <Trophy size={16} />
@@ -237,7 +288,6 @@ function AdminDashboardContent() {
               </select>
             </div>
 
-            {/* School Filter */}
             <div className="relative w-full sm:w-64">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-(--wwf-ocean)">
                 <Filter size={16} />

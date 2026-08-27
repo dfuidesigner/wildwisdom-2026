@@ -10,12 +10,18 @@ import {
   ShieldAlert,
   ArrowLeft,
   UserPlus,
+  LayoutDashboard,
 } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
+import { QueryProvider } from "@/components/providers/QueryProvider"
 import OceanElement from "../home/OceanElement"
 
 const baseUrl = import.meta.env.BASE_URL
 
-export function QuizGuidelines() {
+function QuizGuidelinesContent() {
+  const { user } = useAuth()
+  const isLoggedIn = !!user
+
   return (
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-slate-900 py-12 md:py-16">
       <OceanElement
@@ -63,13 +69,16 @@ export function QuizGuidelines() {
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            {/* <a
-              href={`${baseUrl}register/student`}
-              className="guidelines-blink inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#F78623] px-5 py-2.5 text-sm font-black tracking-wide text-white uppercase shadow-md transition-all hover:bg-[#e07518] active:scale-95"
-            >
-              <UserPlus size={16} />
-              Register Now
-            </a> */}
+            {/* Register CTA — only for guests */}
+            {/* {!isLoggedIn && (
+              <a
+                href={`${baseUrl}register/student`}
+                className="guidelines-blink inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#F78623] px-5 py-2.5 text-sm font-black tracking-wide text-white uppercase shadow-md transition-all hover:bg-[#e07518] active:scale-95"
+              >
+                <UserPlus size={16} />
+                Register Now
+              </a>
+            )} */}
             <a
               href={`${baseUrl}play/levels`}
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-(--wwf-ocean-deep) shadow-sm transition-all hover:bg-slate-50 active:scale-95"
@@ -455,7 +464,7 @@ export function QuizGuidelines() {
                   Disclaimer
                 </h3>
               </div>
-              <div className="space-y-3 text-sm leading-relaxed font-semibold text-amber-900 ">
+              <div className="space-y-3 text-sm leading-relaxed font-semibold text-amber-900">
                 <p>
                   The quiz platform actively monitors browser activity
                   throughout the session.
@@ -481,23 +490,42 @@ export function QuizGuidelines() {
 
             {/* Action Button Navigation back to selector */}
             <div className="flex flex-col gap-3 pt-2">
+              {/* Register CTA — only for guests */}
+              {!isLoggedIn && (
+                <a
+                  href={`${baseUrl}register/student`}
+                  className="guidelines-blink flex w-full items-center justify-center gap-2 rounded-2xl bg-[#F78623] py-4 text-xl font-black tracking-wide text-white uppercase shadow-md transition-all hover:bg-[#e07518] hover:shadow-lg active:scale-95"
+                >
+                  <UserPlus size={18} />
+                  Register Now
+                </a>
+              )}
+
               <a
-                href={`${baseUrl}register/student`}
-                className="guidelines-blink text-xl flex w-full items-center justify-center gap-2 rounded-2xl bg-[#F78623] py-4 font-black tracking-wide text-white uppercase shadow-md transition-all hover:bg-[#e07518] hover:shadow-lg active:scale-95"
+                href={isLoggedIn ? `${baseUrl}play/levels` : `${baseUrl}login`}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-(--wwf-ocean-deep) py-4 text-xl font-bold text-white shadow-md transition-all hover:bg-slate-800 hover:shadow-lg active:scale-95"
               >
-                <UserPlus size={18} />
-                Register Now
-              </a>
-              <a
-                href={`${baseUrl}login`}
-                className="flex w-full text-xl items-center justify-center gap-2 rounded-2xl bg-(--wwf-ocean-deep) py-4 font-bold text-white shadow-md transition-all hover:bg-slate-800 hover:shadow-lg active:scale-95"
-              >
-                Ready to Play?
+                {isLoggedIn ? (
+                  <>
+                    <LayoutDashboard size={18} />
+                    Go to Dashboard
+                  </>
+                ) : (
+                  "Ready to Play?"
+                )}
               </a>
             </div>
           </div>
         </div>
       </div>
     </div>
+  )
+}
+
+export function QuizGuidelines() {
+  return (
+    <QueryProvider>
+      <QuizGuidelinesContent />
+    </QueryProvider>
   )
 }

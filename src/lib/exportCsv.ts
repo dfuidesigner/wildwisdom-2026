@@ -1,7 +1,7 @@
 import { toast } from "sonner"
 import type { AdminSchool, AdminStudent, AdminTeacher } from "@/types/admin"
 
-const formatTime = (seconds?: number) => {
+export const formatTime = (seconds?: number) => {
   if (seconds === undefined || seconds === null) return "0s"
   const m = Math.floor(seconds / 60)
   const s = seconds % 60

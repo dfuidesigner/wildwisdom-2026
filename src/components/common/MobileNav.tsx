@@ -22,12 +22,12 @@ export const MobileNav = ({
 }) => {
   return (
     <div className="flex items-center gap-3 lg:hidden">
-      <a
+      {/* <a
         href={`${baseUrl}register/school`}
         className="bg-orange rounded-full px-5 py-1.5 font-wwf text-lg text-white shadow-md transition-transform active:scale-95 reg-btn"
       >
         REGISTER
-      </a>
+      </a> */}
       <Sheet>
         <SheetTrigger asChild>
           <button className="p-1 text-slate-800" aria-label="Open Menu">

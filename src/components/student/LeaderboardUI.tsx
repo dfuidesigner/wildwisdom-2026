@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, type CSSProperties } from "react"
 import { useQuery } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { useAuth } from "@/hooks/useAuth"
@@ -13,6 +13,10 @@ import {
   Ghost,
   Clock,
   CalendarDays,
+  PartyPopper,
+  Eye,
+  Users,
+  Waves,
 } from "lucide-react"
 
 import {
@@ -54,11 +58,295 @@ interface MyRank {
   date?: string
 }
 
+interface SuccessMsg {
+  score: string
+  completed: boolean
+  nextLevelId: string | null
+}
+
 const formatTime = (seconds?: number) => {
   if (seconds === undefined || seconds === null) return "0s"
   const m = Math.floor(seconds / 60)
   const s = seconds % 60
   return m > 0 ? `${m}m ${s}s` : `${s}s`
+}
+
+/* -------------------------------------------------------------------- */
+/* Blink keyframes (scoped, no tailwind.config / global css edit needed) */
+/* -------------------------------------------------------------------- */
+function BlinkStyles() {
+  return (
+    <style>{`
+      /* Light-sweep across the text. The text NEVER goes transparent:
+         the gradient tiles (repeat) so every letter is always painted,
+         and a solid color fallback sits underneath.
+         Colours come from --shine-base / --shine-hi per instance. */
+      @keyframes wwfShine {
+        from { background-position: 0% 0; }
+        to   { background-position: -162.5% 0; }
+      }
+      @keyframes wwfBreathe {
+        0%, 100% { transform: scale(1); }
+        50%      { transform: scale(1.02); }
+      }
+      .wwf-blink {
+        display: inline-block;
+        color: var(--shine-base);
+        animation: wwfBreathe 3.4s ease-in-out infinite;
+      }
+      @supports ((background-clip: text) or (-webkit-background-clip: text)) {
+        .wwf-blink {
+          background-image: linear-gradient(
+            100deg,
+            var(--shine-base) 0%,
+            var(--shine-base) 42%,
+            var(--shine-hi) 50%,
+            var(--shine-base) 58%,
+            var(--shine-base) 100%
+          );
+          background-size: 260% 100%;
+          background-repeat: repeat;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation:
+            wwfShine 3.4s linear infinite,
+            wwfBreathe 3.4s ease-in-out infinite;
+          will-change: background-position, transform;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .wwf-blink {
+          animation: none;
+          background-image: none;
+          color: var(--shine-base);
+          -webkit-text-fill-color: var(--shine-base);
+        }
+      }
+    `}</style>
+  )
+}
+
+/* -------------------------------------------------------------------- */
+/* ALL LEVELS CLEARED — final completion banner                          */
+/* -------------------------------------------------------------------- */
+function AllLevelsClearedBanner({ score }: { score: string }) {
+  return (
+    <div className="relative overflow-hidden rounded-3xl border border-(--wwf-ocean) bg-[#003140] p-6 text-white shadow-xl md:p-8">
+      <BlinkStyles />
+
+      {/* ambient glows */}
+      <div className="absolute -top-16 -right-16 h-56 w-56 rounded-full bg-[#95DDEA]/15 blur-3xl"></div>
+      <div className="absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-[#F78623]/15 blur-3xl"></div>
+      <div className="absolute top-1/2 left-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#95DDEA]/5 blur-3xl"></div>
+
+      <div className="relative z-10 flex flex-col items-center text-center">
+        {/* Trophy badge */}
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F78623] text-white shadow-lg shadow-[#F78623]/30">
+          <Trophy fill="currentColor" size={32} />
+        </div>
+
+        <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#95DDEA]/40 bg-white/10 px-4 py-1.5 text-[10px] font-black tracking-[0.2em] text-[#95DDEA] uppercase md:text-xs">
+          <PartyPopper size={12} /> All 4 Quizzes Complete
+        </span>
+
+        <h3
+          className="wwf-blink font-wwf text-3xl tracking-widest text-white md:text-4xl lg:text-5xl"
+          style={
+            {
+              "--shine-base": "#FFFFFF",
+              "--shine-hi": "#F78623",
+            } as CSSProperties
+          }
+        >
+          CONGRATULATIONS!
+        </h3>
+
+        <p className="mt-3 max-w-2xl text-base leading-relaxed font-semibold text-[#95DDEA] md:text-lg">
+          You have successfully completed all four challenge quizzes!
+        </p>
+
+        {/* Score pill */}
+        <div className="mt-5 inline-flex flex-wrap items-center justify-center gap-2.5 rounded-2xl border border-[#F78623]/40 bg-[#F78623]/10 px-5 py-3">
+          <Medal size={18} className="text-[#F78623]" />
+          <span className="text-xs font-bold tracking-widest text-white/70 uppercase">
+            Final Level Score
+          </span>
+          <span className="font-wwf text-2xl tracking-widest text-[#F78623] md:text-3xl">
+            {score}
+          </span>
+        </div>
+      </div>
+
+      {/* Info cards */}
+      <div className="relative z-10 mt-8 grid gap-4 md:grid-cols-3">
+        <div className="rounded-2xl border border-[#95DDEA]/25 bg-white/10 p-5 text-left">
+          <div className="mb-2 flex items-center gap-2 text-[#F78623]">
+            <CalendarDays size={15} />
+            <span className="text-[10px] font-black tracking-[0.2em] uppercase">
+              Results
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed font-medium text-white md:text-base">
+            The results will be declared on{" "}
+            <strong className="text-[#95DDEA]">22nd September 2026</strong>.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-[#95DDEA]/25 bg-white/10 p-5 text-left">
+          <div className="mb-2 flex items-center gap-2 text-[#F78623]">
+            <Users size={15} />
+            <span className="text-[10px] font-black tracking-[0.2em] uppercase">
+              Teacher Dashboard
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed font-medium text-white md:text-base">
+            The top two scorers will also be reflected on the Teacher Dashboard
+            once the quiz window closes on{" "}
+            <strong className="text-[#95DDEA]">20th September 2026</strong>.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-[#95DDEA]/25 bg-white/10 p-5 text-left">
+          <div className="mb-2 flex items-center gap-2 text-[#F78623]">
+            <Eye size={15} />
+            <span className="text-[10px] font-black tracking-[0.2em] uppercase">
+              Answer Key
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed font-medium text-white md:text-base">
+            Please note that the answers to all the questions will be revealed
+            on the Students’ Dashboard on the same day.
+          </p>
+        </div>
+      </div>
+
+      {/* Closing note + CTA */}
+      <div className="relative z-10 mt-6 flex flex-col items-center justify-between gap-5 rounded-2xl border border-[#95DDEA]/30 bg-white/5 p-5 text-center md:flex-row md:p-6 md:text-left">
+        <div className="flex items-start gap-3">
+          <Waves
+            size={20}
+            className="mt-1 hidden shrink-0 text-[#95DDEA] md:block"
+          />
+          <div>
+            <p className="text-sm leading-relaxed font-medium text-white md:text-base">
+              Until then, keep learning, keep exploring, and continue to dive
+              deep into the amazing world of oceans!
+            </p>
+            <p className="mt-2 font-wwf text-xl tracking-widest text-[#F78623] md:text-2xl">
+              GOOD LUCK!
+            </p>
+          </div>
+        </div>
+
+        <button
+          className="group flex w-full shrink-0 items-center justify-center gap-2 rounded-full bg-[#F78623] px-7 py-3.5 font-wwf text-lg tracking-widest text-white shadow-lg transition-all hover:scale-105 md:w-auto md:text-xl"
+          onClick={() => {
+            const base = import.meta.env.BASE_URL
+            window.location.assign(`${base}play/levels`)
+          }}
+        >
+          RETURN TO MAP
+          <ArrowRight
+            size={18}
+            strokeWidth={3}
+            className="transition-transform group-hover:translate-x-1"
+          />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------- */
+/* LEVEL CLEARED (more levels remaining)                                 */
+/* -------------------------------------------------------------------- */
+function LevelClearedBanner({
+  score,
+  nextLevelId,
+}: {
+  score: string
+  nextLevelId: string | null
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-3xl border border-(--wwf-ocean) bg-[#003140] p-6 text-white shadow-xl md:p-8">
+      <BlinkStyles />
+
+      <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-[#95DDEA]/10 blur-3xl"></div>
+      <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-[#F78623]/10 blur-3xl"></div>
+
+      <div className="relative z-10 flex flex-col items-center justify-between gap-6 md:flex-row">
+        <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:text-left">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#F78623] text-3xl text-white shadow-lg shadow-[#F78623]/20">
+            <Trophy fill="currentColor" size={32} />
+          </div>
+
+          <div>
+            <h3
+              className="wwf-blink font-wwf text-3xl tracking-widest text-white md:text-4xl"
+              style={
+                {
+                  "--shine-base": "#FFFFFF",
+                  "--shine-hi": "#F78623",
+                } as CSSProperties
+              }
+            >
+              CONGRATULATIONS!
+            </h3>
+            <p className="mt-1 text-sm font-medium text-[#95DDEA] md:text-base">
+              You have completed the quiz level and are now eligible to access
+              the next quiz.
+            </p>
+            <p className="mt-2 text-sm font-bold text-white md:text-base">
+              Score: {score} points
+            </p>
+          </div>
+        </div>
+
+        <button
+          className="group flex w-full items-center justify-center gap-2 rounded-full bg-[#F78623] px-7 py-3.5 font-wwf text-lg tracking-widest text-white shadow-lg transition-all hover:scale-105 md:w-auto md:text-xl"
+          onClick={() => {
+            const base = import.meta.env.BASE_URL
+            if (nextLevelId) {
+              window.location.assign(`${base}play/game?levelId=${nextLevelId}`)
+            } else {
+              window.location.assign(`${base}play/levels`)
+            }
+          }}
+        >
+          {nextLevelId ? "NEXT LEVEL" : "RETURN TO MAP"}{" "}
+          <ArrowRight
+            size={18}
+            strokeWidth={3}
+            className="transition-transform group-hover:translate-x-1"
+          />
+        </button>
+      </div>
+
+      <div className="relative z-10 mt-6 rounded-2xl border border-[#95DDEA]/30 bg-white/10 p-5 text-center md:text-left">
+        <p className="text-sm font-medium text-white md:text-base">
+          The quiz link will remain valid until{" "}
+          <strong>20th September 2026</strong>.
+        </p>
+        <p className="mt-2 font-wwf text-xl tracking-wide text-[#F78623] md:text-2xl">
+          🌊 Prepare Before You Play!
+        </p>
+        <p className="mt-2 text-sm font-medium text-[#95DDEA] md:text-base">
+          Before taking the next <strong>quiz</strong>, make sure you prepare
+          well and are ready to take on the challenge!
+        </p>
+        <p className="mt-2 text-sm font-medium break-all text-[#95DDEA] md:text-base">
+          Link:{" "}
+          <a
+            href="https://wildwisdom.wwfindia.org/resources/"
+            className="font-bold text-white underline underline-offset-4 hover:text-[#F78623]"
+          >
+            https://wildwisdom.wwfindia.org/resources/
+          </a>
+        </p>
+      </div>
+    </div>
+  )
 }
 
 function LeaderboardContent() {
@@ -69,7 +357,7 @@ function LeaderboardContent() {
   )
   const PLATFORM_SLUG = import.meta.env.PUBLIC_PLATFORM_SLUG || "wildwisdom"
 
-  const [successMsg] = useState(() => {
+  const [successMsg] = useState<SuccessMsg | null>(() => {
     const params = new URLSearchParams(window.location.search)
     return params.get("success") === "true"
       ? {
@@ -178,80 +466,16 @@ function LeaderboardContent() {
 
   return (
     <div className="space-y-6 pb-24 md:space-y-8">
-      {successMsg && (
-        <div className="relative overflow-hidden rounded-3xl border border-(--wwf-ocean) bg-[#003140] p-6 text-white shadow-xl md:p-8">
-          <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-[#95DDEA]/10 blur-3xl"></div>
-          <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-[#F78623]/10 blur-3xl"></div>
+      {successMsg &&
+        (successMsg.completed ? (
+          <AllLevelsClearedBanner score={successMsg.score} />
+        ) : (
+          <LevelClearedBanner
+            score={successMsg.score}
+            nextLevelId={successMsg.nextLevelId}
+          />
+        ))}
 
-          <div className="relative z-10 flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:text-left">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#F78623] text-3xl text-white shadow-lg shadow-[#F78623]/20">
-                <Trophy fill="currentColor" size={32} />
-              </div>
-
-              <div>
-                <h3 className="font-wwf text-3xl tracking-widest text-white">
-                  CONGRATULATIONS!
-                </h3>
-                <p className="text-base font-medium text-[#95DDEA]">
-                  {successMsg.completed
-                    ? "Results to be declared on 22nd september so all the answers will be revealed on that day itself"
-                    : "You have completed the quiz level and are now eligible to access the next quiz."}
-                </p>
-                <p className="mt-1 text-sm font-bold text-white">
-                  Score: {successMsg.score} points
-                </p>
-              </div>
-            </div>
-
-            <button
-              className="group flex w-full items-center justify-center gap-2 rounded-full bg-[#F78623] px-8 py-4 font-wwf text-xl tracking-widest text-white shadow-lg transition-all hover:scale-105 md:w-auto"
-              onClick={() => {
-                const base = import.meta.env.BASE_URL
-                if (successMsg?.completed || !successMsg?.nextLevelId) {
-                  window.location.assign(`${base}play/levels`)
-                } else {
-                  window.location.assign(
-                    `${base}play/game?levelId=${successMsg.nextLevelId}`
-                  )
-                }
-              }}
-            >
-              {successMsg.completed ? "RETURN TO MAP" : "NEXT LEVEL"}{" "}
-              <ArrowRight
-                size={20}
-                strokeWidth={3}
-                className="transition-transform group-hover:translate-x-1"
-              />
-            </button>
-          </div>
-
-          {!successMsg.completed && (
-            <div className="relative z-10 mt-6 rounded-2xl border border-[#95DDEA]/30 bg-white/10 p-5 text-center md:text-left">
-              <p className="text-sm font-medium text-white md:text-base">
-                The quiz link will remain valid until{" "}
-                <strong>20th September 2026</strong>.
-              </p>
-              <p className="mt-2 font-wwf text-xl tracking-wide text-[#F78623]">
-                🌊 Prepare Before You Play!
-              </p>
-              <p className="mt-1 text-sm font-medium text-[#95DDEA] md:text-base">
-                Before taking the next <strong>quiz</strong>, make sure you
-                prepare well and are ready to take on the challenge!
-              </p>
-              <p className="mt-2 text-sm font-medium break-all text-[#95DDEA] md:text-base">
-                Link:{" "}
-                <a
-                  href="https://wildwisdom.wwfindia.org/resources/"
-                  className="font-bold text-white underline underline-offset-4 hover:text-[#F78623]"
-                >
-                  https://wildwisdom.wwfindia.org/resources/
-                </a>
-              </p>
-            </div>
-          )}
-        </div>
-      )}
       <div className="grid gap-4 md:grid-cols-3 md:gap-6">
         <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:col-span-1 md:p-6">
           <div className="mb-4 flex items-center gap-2">
@@ -280,14 +504,12 @@ function LeaderboardContent() {
                 <p className="font-wwf text-5xl tracking-widest text-[#F78623]">
                   {myRank?.total_score || 0}
                 </p>
-                <p>
-                  {myRank?.total_time_taken !== undefined && (
-                    <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold text-[#003140]/50">
-                      <Clock size={12} />
-                      Time: {formatTime(myRank.total_time_taken)}
-                    </div>
-                  )}
-                </p>
+                {myRank?.total_time_taken !== undefined && (
+                  <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold text-[#003140]/50">
+                    <Clock size={12} />
+                    Time: {formatTime(myRank.total_time_taken)}
+                  </div>
+                )}
                 {myRank?.date && (
                   <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold text-[#003140]/50">
                     <CalendarDays size={12} />

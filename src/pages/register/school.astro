@@ -7,7 +7,7 @@ import Container from "@/components/common/Container.astro"
 // const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "")
 ---
 
-<MainLayout title="Register School">
+<MainLayout title="Register School - Closed">
   <div
     class="relative flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden"
   >
@@ -15,16 +15,41 @@ import Container from "@/components/common/Container.astro"
       heading="Registration for the<br/> Wild Wisdom Global Challenge 2026"
     /> -->
     <InsidePageHero banner="images/banners/banner-3.webp" />
+
     <!-- <div
       class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
       style={`background-image: url('${baseUrl}/images/last-bg.webp');`}
     >
     </div> -->
+
     <Container>
       <div
         class="mt-10 mb-50 rounded-[2.5rem] border border-white/20 bg-white/95 p-6 shadow-2xl backdrop-blur-xl sm:p-10"
       >
-        <SchoolRegistrationForm client:load />
+        <!-- Registration Closed Message -->
+        <div
+          class="flex flex-col items-center justify-center py-12 text-center sm:py-16"
+        >
+          <h2
+            class="text-ocean-deep mb-4 font-wwf text-4xl tracking-wide uppercase sm:text-5xl"
+          >
+            Registrations Closed
+          </h2>
+          <p
+            class="text-ocean-semi-dark mx-auto mb-8 max-w-2xl text-lg sm:text-xl"
+          >
+            Thank you for your overwhelming interest! The registration window
+            for the Wild Wisdom Global Challenge is now officially closed.
+          </p>
+          <a
+            href="/"
+            class="btn-wwf-primary inline-block font-wwf text-lg tracking-wider uppercase"
+          >
+            Return to Home
+          </a>
+        </div>
+
+        <!-- <SchoolRegistrationForm client:load /> -->
       </div>
     </Container>
   </div>
