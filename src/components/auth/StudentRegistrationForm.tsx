@@ -19,8 +19,9 @@ import {
   Building2,
   Info,
   FileExclamationPoint,
-  RefreshCw,
+  Copy,
   ShieldCheck,
+  AlertTriangle,
 } from "lucide-react"
 
 const grades = ["6", "7", "8", "9"] as const
@@ -32,20 +33,6 @@ const studentSchema = z
       .min(4, "School code is required")
       .max(20, "School code is too long")
       .regex(/^[^<>]*$/, "Invalid characters detected"),
-
-    identifier: z
-      .string()
-      .min(1, "Email or phone number is required")
-      .max(255, "Identifier is too long")
-      .refine((v) => {
-        const val = v.trim()
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || /^\d{10}$/.test(val)
-      }, "Enter a valid email address or a 10-digit mobile number"),
-
-    otp: z
-      .string()
-      .length(6, "OTP must be exactly 6 digits")
-      .regex(/^\d+$/, "OTP must contain only numbers"),
 
     grade: z.enum(grades, {
       errorMap: () => ({ message: "Please select a valid grade" }),
@@ -78,14 +65,6 @@ const studentSchema = z
 
 type StudentFormData = z.infer<typeof studentSchema>
 
-interface SimpleApiResponse {
-  status: "success" | "error"
-  message?: string
-}
-interface AvailabilityResponse {
-  available: boolean
-}
-
 const getErrorMessage = (
   error: AxiosError<ValidationErrorResponse>,
   fallback: string
@@ -106,16 +85,12 @@ function StudentRegistrationFormComponent() {
     handleSubmit,
     setError,
     clearErrors,
-    getValues,
-    setValue,
     watch,
     formState: { errors },
   } = useForm<StudentFormData>({
     resolver: zodResolver(studentSchema),
     defaultValues: {
       school_code: "",
-      identifier: "",
-      otp: "",
       section: "",
       roll_number: "",
       grade: "6",
@@ -124,95 +99,14 @@ function StudentRegistrationFormComponent() {
     },
   })
 
-  const watchedIdentifier = watch("identifier") ?? ""
-  const watchedOtp = watch("otp") ?? ""
   const watchedSchoolCode = watch("school_code") ?? ""
-
-  // debounce
-  const [debouncedIdentifier, setDebouncedIdentifier] = useState("")
   const [debouncedCode, setDebouncedCode] = useState("")
-
-  useEffect(() => {
-    const timer = setTimeout(
-      () => setDebouncedIdentifier(watchedIdentifier),
-      500
-    )
-    return () => clearTimeout(timer)
-  }, [watchedIdentifier])
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedCode(watchedSchoolCode), 500)
     return () => clearTimeout(timer)
   }, [watchedSchoolCode])
 
-  // detect channel from identifier
-  const debouncedTrimmed = debouncedIdentifier.trim()
-  const detectedIsEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(debouncedTrimmed)
-  const detectedIsPhone = /^\d{10}$/.test(debouncedTrimmed)
-  const channel: "phone" | "email" | null = detectedIsPhone
-    ? "phone"
-    : detectedIsEmail
-      ? "email"
-      : null
-
-  // identifier availability checks
-  const { data: phoneCheck } = useQuery({
-    queryKey: ["checkStudentPhone", debouncedIdentifier],
-    queryFn: async () => {
-      const r = await api.get(`/student/check-phone/${debouncedTrimmed}`)
-      return r.data.data as AvailabilityResponse
-    },
-    enabled: detectedIsPhone,
-    retry: false,
-  })
-
-  const { data: emailCheck } = useQuery({
-    queryKey: ["checkStudentEmail", debouncedIdentifier],
-    queryFn: async () => {
-      const r = await api.get(
-        `/student/check-email?email=${encodeURIComponent(debouncedTrimmed)}`
-      )
-      return r.data.data as AvailabilityResponse
-    },
-    enabled: detectedIsEmail,
-    retry: false,
-  })
-
-  const isTaken = detectedIsPhone
-    ? phoneCheck?.available === false
-    : detectedIsEmail
-      ? emailCheck?.available === false
-      : false
-
-  const isAvailable = detectedIsPhone
-    ? phoneCheck?.available === true
-    : detectedIsEmail
-      ? emailCheck?.available === true
-      : false
-
-  const showOtpInput = isAvailable
-
-  // OTP state
-  const [otpSent, setOtpSent] = useState(false)
-  const [otpVerified, setOtpVerified] = useState(false)
-  const [resendSeconds, setResendSeconds] = useState(0)
-
-  // Reset OTP state whenever the identifier changes
-  useEffect(() => {
-    setOtpSent(false)
-    setOtpVerified(false)
-    setValue("otp", "")
-    clearErrors(["identifier"])
-  }, [watchedIdentifier, setValue, clearErrors])
-
-  // Resend countdown
-  useEffect(() => {
-    if (resendSeconds <= 0 || otpVerified) return
-    const timer = setTimeout(() => setResendSeconds((v) => v - 1), 1000)
-    return () => clearTimeout(timer)
-  }, [resendSeconds, otpVerified])
-
-  // school code check
   const {
     data: schoolInfo,
     isFetching: isCheckingSchool,
@@ -229,84 +123,30 @@ function StudentRegistrationFormComponent() {
     retry: false,
   })
 
-  // mutations
-  const identifierPayload = () => {
-    const val = getValues("identifier").trim()
-    return channel === "phone" ? { phone_number: val } : { email: val }
-  }
-
-  const sendOtpMutation = useMutation<
-    SimpleApiResponse,
-    AxiosError<ValidationErrorResponse>,
-    { email?: string; phone_number?: string }
-  >({
-    mutationFn: async (payload) => {
-      const r = await api.post("/student/send-otp", payload)
-      return r.data
-    },
-    onSuccess: (data) => {
-      setOtpSent(true)
-      setOtpVerified(false)
-      setValue("otp", "")
-      setResendSeconds(60)
-      toast.success("OTP Sent", {
-        description:
-          channel === "phone"
-            ? "OTP sent to your mobile."
-            : "OTP sent to your email address.",
-      })
-    },
-    onError: (error) => {
-      toast.error("OTP Failed", {
-        description: getErrorMessage(error, "Could not send OTP."),
-      })
-    },
-  })
-
-  const verifyOtpMutation = useMutation<
-    SimpleApiResponse,
-    AxiosError<ValidationErrorResponse>,
-    { email?: string; phone_number?: string; otp: string }
-  >({
-    mutationFn: async (payload) => {
-      const r = await api.post("/student/verify-otp", payload)
-      return r.data
-    },
-    onSuccess: (data) => {
-      setOtpVerified(true)
-      toast.success("OTP Verified", {
-        description: data.message || "You can now complete registration.",
-      })
-    },
-    onError: (error) => {
-      setOtpVerified(false)
-      toast.error("OTP Verification Failed", {
-        description: getErrorMessage(error, "Invalid or expired OTP."),
-      })
-    },
-  })
+  const [credentials, setCredentials] = useState<{
+    studentId: string
+    password: string
+  } | null>(null)
+  const [hasConfirmedSaved, setHasConfirmedSaved] = useState(false)
 
   const registerMutation = useMutation<
     StudentRegisterResponse,
     AxiosError<ValidationErrorResponse>,
-    Record<string, string>
+    { payload: Record<string, string>; rawPassword: string }
   >({
-    mutationFn: async (data) => {
-      const r = await api.post("/register-student", data)
+    mutationFn: async (vars) => {
+      const r = await api.post("/register-student", vars.payload)
       return r.data
     },
-    onSuccess: async (data) => {
+    onSuccess: (data, variables) => {
       localStorage.setItem("ws_token", data.token)
       localStorage.setItem("ws_user", JSON.stringify(data.user))
       queryClient.setQueryData(["authUser"], data.user)
 
-      toast.success("Registration Successful!", {
-        description: "Welcome to WildWisdom!",
+      setCredentials({
+        studentId: data.user.phone_number,
+        password: variables.rawPassword,
       })
-
-      setTimeout(() => {
-        window.location.assign(`${import.meta.env.BASE_URL}play/levels`)
-      }, 800)
     },
     onError: (error) => {
       toast.error("Registration Failed", {
@@ -315,63 +155,21 @@ function StudentRegistrationFormComponent() {
     },
   })
 
-  // handlers
-  const handleSendOtp = async () => {
-    clearErrors("root")
-    if (!channel) {
-      toast.error("Provide a contact", {
-        description:
-          "Enter a valid 10-digit mobile number or email so we can send your code.",
-      })
-      return
-    }
-    sendOtpMutation.mutate(identifierPayload())
-  }
-
-  const handleVerifyOtp = async () => {
-    clearErrors("root")
-    const otp = getValues("otp")
-    if (!channel || otp.length !== 6) {
-      toast.error("Invalid code", {
-        description: "Enter the 6-digit code we just sent.",
-      })
-      return
-    }
-    verifyOtpMutation.mutate({ ...identifierPayload(), otp })
-  }
-
   const onSubmit = async (data: StudentFormData) => {
     clearErrors("root")
-
-    if (!otpVerified) {
-      toast.error("OTP Required", {
-        description: "Please verify your code before registering.",
-      })
-      return
-    }
-
     try {
       const encryptedPassword = await encryptPayload(data.password)
-      const input = data.identifier.trim()
-      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input)
-
-      const payload: Record<string, string> = {
-        otp: data.otp,
-        grade: data.grade,
-        section: data.section,
-        roll_number: data.roll_number,
-        password: encryptedPassword,
-        password_confirmation: encryptedPassword,
-        school_code: data.school_code,
-      }
-
-      if (isEmail) {
-        payload.email = input
-      } else {
-        payload.phone_number = input
-      }
-
-      registerMutation.mutate(payload)
+      registerMutation.mutate({
+        payload: {
+          grade: data.grade,
+          section: data.section,
+          roll_number: data.roll_number,
+          password: encryptedPassword,
+          password_confirmation: encryptedPassword,
+          school_code: data.school_code,
+        },
+        rawPassword: data.password,
+      })
     } catch {
       setError("root.serverError", {
         type: "manual",
@@ -380,35 +178,123 @@ function StudentRegistrationFormComponent() {
     }
   }
 
-  // render helpers
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text)
+    toast.success(label + " copied")
+  }
+
+  const continueToPlay = () => {
+    window.location.assign(import.meta.env.BASE_URL + "play/levels")
+  }
+
+  if (credentials) {
+    return (
+      <div className="flex flex-col items-center py-4 text-center">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-(--wwf-sea-green)/15">
+          <ShieldCheck size={32} className="text-(--wwf-sea-green)" />
+        </div>
+
+        <h3 className="mb-2 text-2xl font-black text-(--wwf-ocean-deep)">
+          Thank you for registering!
+        </h3>
+
+        <p className="mb-6 max-w-sm text-sm font-semibold text-slate-600">
+          Please find your login credentials below and keep them safely saved
+          for future use. We also request you to note down your username
+          carefully and ensure that it is stored securely.
+        </p>
+
+        <div className="mb-3 w-full max-w-sm space-y-3">
+          <div>
+            <span className="ml-1 text-[11px] font-black tracking-widest text-(--wwf-ocean-deep)/60 uppercase">
+              Student ID
+            </span>
+            <div className="mt-1 flex items-center justify-between rounded-2xl border-2 border-(--wwf-sea-green) bg-(--wwf-sea-green)/5 px-5 py-3.5">
+              <span className="font-mono text-2xl font-black tracking-[0.15em] text-(--wwf-ocean-deep)">
+                {credentials.studentId}
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  copyToClipboard(credentials.studentId, "Student ID")
+                }
+                className="rounded-lg bg-white p-2 text-(--wwf-ocean) shadow-sm hover:text-(--wwf-coral)"
+              >
+                <Copy size={18} />
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <span className="ml-1 text-[11px] font-black tracking-widest text-(--wwf-ocean-deep)/60 uppercase">
+              Password
+            </span>
+            <div className="mt-1 flex items-center justify-between rounded-2xl border-2 border-slate-200 bg-slate-50 px-5 py-3.5">
+              <span className="font-mono text-lg font-bold text-(--wwf-ocean-deep)">
+                {credentials.password}
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  copyToClipboard(credentials.password, "Password")
+                }
+                className="rounded-lg bg-white p-2 text-(--wwf-ocean) shadow-sm hover:text-(--wwf-coral)"
+              >
+                <Copy size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-6 flex w-full max-w-sm items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-left text-xs font-semibold text-amber-800">
+          <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+          <span>
+            In case you forget your username or password, please contact your
+            Teacher Coordinator and request the credentials again. Thank you,
+            and please keep your login details safe and confidential.
+          </span>
+        </div>
+
+        <label className="mb-5 flex items-center gap-2 text-sm font-bold text-(--wwf-ocean-deep)">
+          <input
+            type="checkbox"
+            checked={hasConfirmedSaved}
+            onChange={(e) => setHasConfirmedSaved(e.target.checked)}
+            className="h-4 w-4 rounded"
+          />
+          I've saved my Student ID and password
+        </label>
+
+        <button
+          type="button"
+          onClick={continueToPlay}
+          disabled={!hasConfirmedSaved}
+          className="btn btn-success flex h-14 w-full max-w-sm items-center justify-center rounded-2xl bg-green-600 text-lg font-black text-white shadow-lg transition-all hover:-translate-y-1 disabled:pointer-events-none disabled:opacity-50"
+        >
+          Continue to Play
+        </button>
+      </div>
+    )
+  }
+
   const renderInput = (
     name: keyof StudentFormData,
     placeholder: string,
-    type: string = "text",
-    maxLength?: number,
-    disabled: boolean = registerMutation.isPending,
-    onInputSanitizer?: (raw: string) => string
+    type: string = "text"
   ) => (
     <div className="w-full space-y-1">
       <input
         id={name}
         type={type}
         placeholder={placeholder}
-        maxLength={maxLength}
         {...register(name)}
-        disabled={disabled}
-        onInput={(e) => {
-          if (onInputSanitizer) {
-            const cleaned = onInputSanitizer(e.currentTarget.value)
-            if (cleaned !== e.currentTarget.value)
-              e.currentTarget.value = cleaned
-          }
-        }}
-        className={`flex h-14 w-full rounded-2xl border-2 bg-slate-50/50 px-4 py-2 text-base font-medium text-(--wwf-ocean-deep) transition-all placeholder:text-slate-500 focus:bg-white focus:ring-4 focus:ring-(--wwf-ocean)/20 focus:outline-none disabled:opacity-50 ${
-          errors[name]
+        disabled={registerMutation.isPending}
+        className={
+          "flex h-14 w-full rounded-2xl border-2 bg-slate-50/50 px-4 py-2 text-base font-medium text-(--wwf-ocean-deep) transition-all placeholder:text-slate-500 focus:bg-white focus:ring-4 focus:ring-(--wwf-ocean)/20 focus:outline-none disabled:opacity-50 " +
+          (errors[name]
             ? "border-red-200 focus:border-red-500"
-            : "border-slate-200 hover:border-(--wwf-ocean-light)/50 focus:border-(--wwf-ocean)"
-        }`}
+            : "border-slate-200 hover:border-(--wwf-ocean-light)/50 focus:border-(--wwf-ocean)")
+        }
       />
       {errors[name] && (
         <p className="ml-1 text-xs font-bold text-red-500">
@@ -428,11 +314,12 @@ function StudentRegistrationFormComponent() {
         id={name}
         {...register(name)}
         disabled={registerMutation.isPending}
-        className={`flex h-14 w-full rounded-2xl border-2 bg-slate-50/50 px-4 py-2 text-base font-medium text-(--wwf-ocean-deep) transition-all focus:bg-white focus:ring-4 focus:ring-(--wwf-ocean)/20 focus:outline-none disabled:opacity-50 ${
-          errors[name]
+        className={
+          "flex h-14 w-full rounded-2xl border-2 bg-slate-50/50 px-4 py-2 text-base font-medium text-(--wwf-ocean-deep) transition-all focus:bg-white focus:ring-4 focus:ring-(--wwf-ocean)/20 focus:outline-none disabled:opacity-50 " +
+          (errors[name]
             ? "border-red-200 focus:border-red-500"
-            : "border-slate-200 hover:border-(--wwf-ocean-light)/50 focus:border-(--wwf-ocean)"
-        }`}
+            : "border-slate-200 hover:border-(--wwf-ocean-light)/50 focus:border-(--wwf-ocean)")
+        }
       >
         <option value="" disabled>
           {placeholder}
@@ -453,7 +340,6 @@ function StudentRegistrationFormComponent() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" noValidate>
-      {/* School Authorization */}
       <fieldset>
         <legend className="mb-2 text-2xl font-bold text-(--wwf-ocean-deep)">
           School Authorization
@@ -475,15 +361,15 @@ function StudentRegistrationFormComponent() {
               placeholder="School Code (e.g. WWGC26-XXXXX)*"
               disabled={registerMutation.isPending}
               {...register("school_code")}
-              className={`flex h-14 w-full rounded-2xl border-2 bg-slate-50/50 px-4 py-2 text-base font-bold tracking-widest text-(--wwf-ocean-deep) uppercase transition-colors placeholder:font-medium placeholder:tracking-normal placeholder:text-slate-500 placeholder:normal-case focus:bg-white focus:ring-4 focus:ring-(--wwf-ocean)/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
-                errors.school_code || isSchoolError
+              className={
+                "flex h-14 w-full rounded-2xl border-2 bg-slate-50/50 px-4 py-2 text-base font-bold tracking-widest text-(--wwf-ocean-deep) uppercase transition-colors placeholder:font-medium placeholder:tracking-normal placeholder:text-slate-500 placeholder:normal-case focus:bg-white focus:ring-4 focus:ring-(--wwf-ocean)/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 " +
+                (errors.school_code || isSchoolError
                   ? "border-red-500 focus:border-red-500"
                   : schoolInfo
                     ? "border-(--wwf-sea-green) focus:border-(--wwf-sea-green)"
-                    : "border-slate-200 hover:border-(--wwf-ocean-light)/50 focus:border-(--wwf-ocean)"
-              }`}
+                    : "border-slate-200 hover:border-(--wwf-ocean-light)/50 focus:border-(--wwf-ocean)")
+              }
             />
-
             <div className="absolute inset-y-0 right-4 flex items-center">
               {isCheckingSchool ? (
                 <Loader2 className="h-6 w-6 animate-spin text-(--wwf-ocean)" />
@@ -516,110 +402,24 @@ function StudentRegistrationFormComponent() {
         </div>
       </fieldset>
 
-      {/* Student Information */}
       <fieldset className="pt-4">
         <legend className="mb-1 text-2xl font-bold text-(--wwf-ocean-deep)">
           Student Information
         </legend>
 
-        <p className="mb-5 text-xs font-semibold text-slate-500">
-          Enter your <strong>email address</strong> or{" "}
-          <strong>10-digit mobile number</strong> — we'll send a verification
-          code there.
-        </p>
+        {/* <p className="mb-5 text-xs font-semibold text-slate-500">
+          We'll generate a unique Student ID for you after registration — no
+          email or phone number needed.
+        </p> */}
 
-        {renderInput("identifier", "Email or 10-digit mobile number*")}
-
-        <div className="mt-4 mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {renderSelect("grade", "Select Grade*", grades)}
           {renderInput("roll_number", "Roll Number*")}
         </div>
 
         <div className="mb-4">{renderInput("section", "Section*")}</div>
-
-        {/* Taken identifier notice */}
-        {isTaken && channel && (
-          <div className="mb-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-            <XCircle className="h-5 w-5 shrink-0" />
-            {channel === "phone"
-              ? "This mobile number is already registered."
-              : "This email is already registered."}
-          </div>
-        )}
-
-        {/* OTP section */}
-        {showOtpInput && (
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <div className="mb-3 flex items-center gap-2 text-sm font-bold text-(--wwf-ocean-deep)">
-              <ShieldCheck size={18} />
-              {channel === "phone"
-                ? "Mobile Verification"
-                : "Email Verification"}
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-              <input
-                id="otp"
-                type="text"
-                maxLength={6}
-                placeholder="Enter 6 digit OTP"
-                disabled={registerMutation.isPending || !otpSent || otpVerified}
-                {...register("otp")}
-                onInput={(e) => {
-                  e.currentTarget.value = e.currentTarget.value
-                    .replace(/[^0-9]/g, "")
-                    .slice(0, 6)
-                }}
-                className={`flex h-14 w-full rounded-2xl border-2 bg-slate-50/50 px-4 py-2 text-base font-medium text-(--wwf-ocean-deep) transition-all placeholder:text-slate-500 focus:bg-white focus:ring-4 focus:ring-(--wwf-ocean)/20 focus:outline-none disabled:opacity-50 ${
-                  errors.otp
-                    ? "border-red-200 focus:border-red-500"
-                    : "border-slate-200 hover:border-(--wwf-ocean-light)/50 focus:border-(--wwf-ocean)"
-                }`}
-              />
-
-              <button
-                type="button"
-                onClick={otpSent ? handleVerifyOtp : handleSendOtp}
-                disabled={
-                  sendOtpMutation.isPending ||
-                  verifyOtpMutation.isPending ||
-                  otpVerified ||
-                  (otpSent && watchedOtp.length !== 6)
-                }
-                className="h-14 rounded-2xl bg-(--wwf-ocean-deep) px-5 text-sm font-bold text-white disabled:opacity-50"
-              >
-                {otpVerified
-                  ? "Verified"
-                  : verifyOtpMutation.isPending
-                    ? "Verifying..."
-                    : sendOtpMutation.isPending
-                      ? "Sending..."
-                      : otpSent
-                        ? "Verify OTP"
-                        : channel === "email"
-                          ? "Send Email OTP"
-                          : "Send SMS OTP"}
-              </button>
-            </div>
-
-            {otpSent && !otpVerified && (
-              <button
-                type="button"
-                onClick={handleSendOtp}
-                disabled={sendOtpMutation.isPending || resendSeconds > 0}
-                className="mt-3 flex items-center gap-1 text-xs font-bold text-(--wwf-ocean-deep) disabled:opacity-50"
-              >
-                <RefreshCw size={13} />
-                {resendSeconds > 0
-                  ? `Resend in ${resendSeconds}s`
-                  : "Resend OTP"}
-              </button>
-            )}
-          </div>
-        )}
       </fieldset>
 
-      {/* Security */}
       <fieldset className="pt-4">
         <legend className="text-2xl font-bold text-(--wwf-ocean-deep)">
           Password
@@ -647,7 +447,6 @@ function StudentRegistrationFormComponent() {
           type="submit"
           disabled={
             registerMutation.isPending ||
-            !otpVerified ||
             (debouncedCode.length >= 4 && isSchoolError)
           }
           className="btn btn-success relative flex h-14 w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-green-600 text-lg font-black text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl disabled:pointer-events-none disabled:opacity-50"
@@ -657,8 +456,6 @@ function StudentRegistrationFormComponent() {
               <Loader2 className="h-5 w-5 animate-spin" />
               Registering...
             </>
-          ) : !otpVerified ? (
-            <>Verify your code to continue</>
           ) : (
             <>Submit and Play</>
           )}

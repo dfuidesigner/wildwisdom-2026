@@ -25,6 +25,9 @@ export interface Student {
   status: "Pending" | "Active" | "Completed"
   level_breakdowns?: LevelBreakdown[]
   has_started_playing: boolean
+  login_id: string
+  password: string
+  is_new_account: boolean
 }
 
 export interface PaginatedStudents {

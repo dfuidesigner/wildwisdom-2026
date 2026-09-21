@@ -115,12 +115,12 @@ function LoginFormComponent() {
             htmlFor="login_id"
             className="ml-1 text-xs font-black tracking-widest text-(--wwf-ocean-light) uppercase"
           >
-            Email or Phone Number
+            Mobile/Login ID
           </label>
           <input
             id="login_id"
             type="text"
-            placeholder="you@example.com or 9876543210"
+            placeholder="9876543210"
             autoComplete="username"
             disabled={loginMutation.isPending}
             {...register("login_id")}

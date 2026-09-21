@@ -24,6 +24,9 @@ export function useGameplayEngine(levelId: string | null) {
   const [focusViolationMessage, setFocusViolationMessage] = useState<
     string | null
   >(null)
+  const [focusViolationLevel, setFocusViolationLevel] = useState<
+    "warning" | "final" | "submitted" | null
+  >(null)
   const lastViolationAtRef = useRef(0)
   const focusViolationCountRef = useRef(0)
   const didEnterFullscreenRef = useRef(false)
@@ -47,13 +50,16 @@ export function useGameplayEngine(levelId: string | null) {
   })
 
   const submitMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (
+      trigger: "manual" | "timeout" | "focus_violation" | "abandoned"
+    ) => {
       const formattedAnswers = Object.entries(answers).map(([qId, oId]) => ({
         question_id: parseInt(qId),
         option_id: oId,
       }))
       return await api.post(`/play/${PLATFORM_SLUG}/levels/${levelId}/submit`, {
         answers: formattedAnswers,
+        trigger,
       })
     },
     onSuccess: (response) => {
@@ -102,35 +108,74 @@ export function useGameplayEngine(levelId: string | null) {
     }
   }, [])
 
+  // const registerFocusViolation = useCallback(
+  //   (reason: string) => {
+  //     if (isSubmittingRef.current) return
+
+  //     const now = Date.now()
+
+  //     if (now - lastViolationAtRef.current < 1500) return
+
+  //     lastViolationAtRef.current = now
+
+  //     const next = focusViolationCountRef.current + 1
+
+  //     focusViolationCountRef.current = next
+  //     setFocusViolationCount(next)
+
+  //     if (next > MAX_FOCUS_VIOLATIONS) {
+  //       setFocusViolationMessage(
+  //         "Focus rule broken. Your quiz is being submitted."
+  //       )
+  //       isSubmittingRef.current = true
+  //       submitMutation.mutate("focus_violation")
+  //       return
+  //     }
+
+  //     setFocusViolationMessage(
+  //       `${reason}. Warning ${next}/${MAX_FOCUS_VIOLATIONS}. Please stay on the quiz screen.`
+  //     )
+  //   },
+  //   [submitMutation]
+  // )
+
   const registerFocusViolation = useCallback(
     (reason: string) => {
       if (isSubmittingRef.current) return
 
       const now = Date.now()
-
       if (now - lastViolationAtRef.current < 1500) return
-
       lastViolationAtRef.current = now
 
       const next = focusViolationCountRef.current + 1
-
       focusViolationCountRef.current = next
       setFocusViolationCount(next)
 
+      // 4th violation — this is what actually submits
       if (next > MAX_FOCUS_VIOLATIONS) {
         setFocusViolationMessage(
-          "Focus rule broken. Your quiz is being submitted."
+          "Please note that you have exhausted all three warnings for attempting to open another tab or use AI tools during the quiz. Therefore, your quiz will now be submitted automatically."
         )
-
+        setFocusViolationLevel("submitted")
         isSubmittingRef.current = true
-        submitMutation.mutate()
-
+        submitMutation.mutate("focus_violation")
         return
       }
 
+      // 3rd violation — same message shown as a warning, does NOT submit yet
+      if (next === MAX_FOCUS_VIOLATIONS) {
+        setFocusViolationMessage(
+          "Please note that you have exhausted all three warnings for attempting to open another tab or use AI tools during the quiz. Therefore, your quiz will now be submitted automatically."
+        )
+        setFocusViolationLevel("final")
+        return
+      }
+
+      // 1st and 2nd violations
       setFocusViolationMessage(
         `${reason}. Warning ${next}/${MAX_FOCUS_VIOLATIONS}. Please stay on the quiz screen.`
       )
+      setFocusViolationLevel("warning")
     },
     [submitMutation]
   )
@@ -231,13 +276,13 @@ export function useGameplayEngine(levelId: string | null) {
   useEffect(() => {
     if (timeLeft === 0 && !isSubmittingRef.current) {
       isSubmittingRef.current = true
-      submitMutation.mutate()
+      submitMutation.mutate("timeout")
     }
   }, [timeLeft, submitMutation])
 
   const handleAbandon = () => {
     isSubmittingRef.current = true
-    submitMutation.mutate()
+    submitMutation.mutate("abandoned")
   }
 
   const formatTime = (rawSeconds: number) => {
@@ -282,6 +327,7 @@ export function useGameplayEngine(levelId: string | null) {
       focusViolationCount,
       focusViolationMessage,
       maxFocusViolations: MAX_FOCUS_VIOLATIONS,
+      focusViolationLevel, // NEW
     },
     actions: {
       setAnswers,
@@ -302,7 +348,7 @@ export function useGameplayEngine(levelId: string | null) {
       },
       submitLevel: () => {
         isSubmittingRef.current = true
-        submitMutation.mutate()
+        submitMutation.mutate("manual")
       },
       startTimer,
     },

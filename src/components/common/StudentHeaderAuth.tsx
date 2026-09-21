@@ -30,7 +30,7 @@ function StudentHeaderAuthContent() {
         </a>
         <a
           href={`${import.meta.env.BASE_URL}register/student`}
-          className="flex items-center gap-2 rounded-full bg-(--wwf-coral) px-3 py-1.5 text-xl text-white shadow-sm transition-all hover:bg-(--wwf-orange) hover:shadow-(--wwf-coral)/20 active:scale-95 max-[480px]:text-sm"
+          className="flex items-center gap-2 rounded-full bg-(--wwf-coral) px-3 py-2.5 text-xl text-white shadow-sm transition-all hover:bg-(--wwf-orange) hover:shadow-(--wwf-coral)/20 active:scale-95 max-[480px]:text-sm"
         >
           <UserPlus size={16} /> Register Here
         </a>

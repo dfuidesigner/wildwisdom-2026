@@ -34,6 +34,7 @@ export interface StudentRegisterResponse {
     id: number
     name: string
     email: string | null
+    phone_number: string
     role: string
   }
 }

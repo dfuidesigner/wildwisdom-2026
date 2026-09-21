@@ -86,6 +86,9 @@ export interface AdminStudent {
     level_number: number
     score: number
     time_taken?: number
+    retake_count: number
+    auto_submitted: boolean
+    submission_type: string
   }[]
 }
 
@@ -96,4 +99,22 @@ export interface AdminTeacher {
   school_name: string
   phone: string | null
   joined_at: string
+}
+
+export interface AdminStateStat {
+  state: string
+  total_schools: number
+  expected_students: number
+  registered_students: number
+}
+
+export interface AdminSchoolParticipation {
+  school_id: number
+  school_name: string
+  unique_code: string
+  state: string
+  expected_students: number
+  registered_students: number
+  students_started: number
+  has_started: boolean
 }

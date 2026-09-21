@@ -20,6 +20,7 @@ import {
   Eye,
   Clock,
   Waves,
+  AlertTriangle,
 } from "lucide-react"
 import OceanElement from "../home/OceanElement"
 const baseUrl = import.meta.env.BASE_URL
@@ -42,6 +43,8 @@ interface Level {
   completed_at: string | null
   is_locked: boolean
   unlocks_at: string | null
+  auto_submitted: boolean
+  submission_type: string | null
 }
 
 interface LevelSelectorResponse {
@@ -611,6 +614,19 @@ function LevelSelectorContent() {
                       >
                         {level.title}
                       </h4>
+                      {level.auto_submitted && (
+                        <div className="mt-1 flex items-start gap-1.5 text-xs font-bold text-amber-600">
+                          <AlertTriangle
+                            size={12}
+                            className="mt-0.5 shrink-0"
+                          />
+                          <span>
+                            {level.submission_type === "focus_violation"
+                              ? "This quiz was auto-submitted after you exhausted all three warnings for switching tabs or using AI tools."
+                              : "This quiz was auto-submitted because the time ran out."}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 

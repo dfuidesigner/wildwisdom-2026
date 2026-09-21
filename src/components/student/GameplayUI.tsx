@@ -195,11 +195,24 @@ function GameplayContent() {
 
         <div ref={questionTopRef} className="scroll-mt-24 p-6 sm:p-10">
           {state.focusViolationMessage && (
-            <div className="sticky top-4 z-20 mb-6 flex items-center gap-3 rounded-2xl border-2 border-red-700 bg-red-600 px-5 py-4 text-white shadow-xl">
+            <div
+              className={`sticky top-4 z-20 mb-6 flex items-center gap-3 rounded-2xl border-2 px-5 py-4 text-white shadow-xl ${
+                state.focusViolationLevel === "final"
+                  ? "animate-pulse border-red-900 bg-red-800"
+                  : "border-red-700 bg-red-600"
+              }`}
+            >
               <AlertTriangle size={26} className="shrink-0 animate-pulse" />
-              <p className="text-base leading-snug font-black">
-                {state.focusViolationMessage}
-              </p>
+              <div>
+                {state.focusViolationLevel === "final" && (
+                  <p className="mb-0.5 text-xs font-black tracking-widest uppercase opacity-90">
+                    Final Warning
+                  </p>
+                )}
+                <p className="text-base leading-snug font-black">
+                  {state.focusViolationMessage}
+                </p>
+              </div>
             </div>
           )}
           <QuestionCard

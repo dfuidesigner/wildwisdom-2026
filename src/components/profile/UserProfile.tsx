@@ -270,7 +270,7 @@ function UserProfileContent() {
 
                       <div className="flex flex-1 flex-col justify-center overflow-hidden">
                         <p className="mb-0.5 text-[10px] font-black tracking-widest text-(--wwf-ocean-light) uppercase">
-                          Mobile Number
+                          User ID
                         </p>
 
                         <p className="truncate text-base font-bold text-(--wwf-ocean-deep)">

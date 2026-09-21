@@ -63,17 +63,19 @@ export function StudentsTable({ students, isLoading, categorySlug }: Props) {
   const handleRetake = (
     studentId: number,
     levelId: number,
-    levelNumber: number
+    levelNumber: number,
+    autoSubmitted?: boolean
   ) => {
+    const note = autoSubmitted
+      ? " Note: this attempt was auto-submitted when the timer ran out — the student may not have actually finished answering."
+      : ""
+
     const confirmed = window.confirm(
-      `Reset Level ${levelNumber} for this student? Their score for this level will be removed and they'll be able to attempt it again.`
+      `Reset Level ${levelNumber} for this student?${note} Their score for this level will be removed and they'll be able to attempt it again.`
     )
 
     if (confirmed) {
-      retakeMutation.mutate({
-        studentId,
-        levelId,
-      })
+      retakeMutation.mutate({ studentId, levelId })
     }
   }
   return (
@@ -218,27 +220,57 @@ export function StudentsTable({ students, isLoading, categorySlug }: Props) {
                       </div>
                     </div>
 
-                    {/* Level Breakdown Rendering */}
                     {student.level_breakdowns &&
                       student.level_breakdowns.length > 0 && (
-                        <div className="mt-1 flex justify-end gap-1">
+                        <div className="mt-1 flex flex-col items-end gap-1">
                           {student.level_breakdowns.map((lvl) => (
                             <div
                               key={lvl.id}
-                              className="group relative flex items-center gap-1 rounded bg-(--wwf-ocean-light)/20 px-1.5 py-0.5 text-[10px] font-bold text-(--wwf-ocean-deep) transition-colors hover:bg-(--wwf-ocean-light)/40"
-                              title={`Level ${lvl.level_number}: ${lvl.score} pts in ${formatTime(lvl.time_taken)}`}
+                              className="group flex items-center gap-1.5 rounded bg-(--wwf-ocean-light)/20 px-1.5 py-0.5 text-[10px] font-bold text-(--wwf-ocean-deep)"
                             >
-                              L{lvl.level_number}:{" "}
-                              <span className="text-(--wwf-ocean)">
-                                {lvl.score}
+                              <span>
+                                L{lvl.level_number}:{" "}
+                                <span className="text-(--wwf-ocean)">
+                                  {lvl.score}pts
+                                </span>
                               </span>
+                              <span className="text-(--wwf-ocean-deep)/50">
+                                •
+                              </span>
+                              <span className="text-(--wwf-ocean-deep)/70">
+                                {formatTime(lvl.time_taken)}
+                              </span>
+
+                              {lvl.auto_submitted && (
+                                <span
+                                  title={
+                                    lvl.submission_type === "focus_violation"
+                                      ? "Auto-submitted after repeated focus violations (tab switch / left fullscreen)"
+                                      : "Auto-submitted — the timer ran out"
+                                  }
+                                  className="rounded bg-amber-100 px-1 text-amber-700"
+                                >
+                                  <Clock size={9} className="inline" /> Auto
+                                </span>
+                              )}
+
+                              {lvl.retake_count > 0 && (
+                                <span
+                                  title={`Retaken ${lvl.retake_count} time(s) already`}
+                                  className="rounded bg-purple-100 px-1 text-purple-700"
+                                >
+                                  ↻{lvl.retake_count}
+                                </span>
+                              )}
+
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   handleRetake(
                                     student.id,
                                     lvl.id,
-                                    lvl.level_number
+                                    lvl.level_number,
+                                    lvl.auto_submitted
                                   )
                                 }}
                                 disabled={retakeMutation.isPending}

@@ -23,6 +23,10 @@ import {
   Clock,
   Phone,
   ShieldAlert,
+  Lock,
+  KeyRound,
+  EyeOff,
+  Eye,
 } from "lucide-react"
 import type { PaginatedStudents, Stats } from "@/types/teacher"
 import type { School } from "@/types/school"
@@ -89,6 +93,18 @@ function DashboardContent() {
       return response.data.data
     },
   })
+
+  const [visiblePasswords, setVisiblePasswords] = useState<Set<number>>(
+    new Set()
+  )
+
+  const togglePassword = (id: number) => {
+    setVisiblePasswords((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
 
   const { data: paginationData, isLoading: isLoadingStudents } =
     useQuery<PaginatedStudents>({
@@ -443,11 +459,16 @@ function DashboardContent() {
                 className="w-full cursor-pointer bg-transparent text-sm font-bold text-(--wwf-ocean-deep) outline-none"
               >
                 <option value="">All Grades</option>
-                {[...Array(12)].map((_, i) => (
+
+                <option value="6">Grade 6</option>
+                <option value="7">Grade 7</option>
+                <option value="8">Grade 8</option>
+                <option value="9">Grade 9</option>
+                {/* {[...Array(12)].map((_, i) => (
                   <option key={i + 1} value={i + 1}>
                     Grade {i + 1}
                   </option>
-                ))}
+                ))} */}
               </select>
             </div>
 
@@ -587,22 +608,58 @@ function DashboardContent() {
                             </div>
                           )}
 
-                          {/* Name & Email */}
-                          {/* Name & Email */}
                           <div>
                             <div className="text-sm font-bold text-(--wwf-ocean-deep)">
                               {student.name}
                             </div>
+
                             <div className="text-xs font-semibold text-(--wwf-ocean)">
                               {student.email}
                             </div>
-                            {student.phone_number && (
+
+                            {/* {student.phone_number && (
                               <div className="flex items-center gap-1 text-xs font-semibold text-(--wwf-ocean-deep)/60">
                                 <Phone
                                   size={12}
                                   className="text-(--wwf-coral)"
                                 />
                                 {student.phone_number}
+                              </div>
+                            )} */}
+
+                            {student.is_new_account ? (
+                              <>
+                                <div className="mt-1 flex items-center gap-1.5 text-xs font-bold text-(--wwf-ocean-deep)">
+                                  <KeyRound
+                                    size={12}
+                                    className="text-(--wwf-coral)"
+                                  />
+                                  ID: {student.login_id}
+                                </div>
+                                <div className="mt-1 flex items-center gap-1.5 text-xs font-bold text-(--wwf-ocean-deep)">
+                                  <Lock
+                                    size={12}
+                                    className="text-(--wwf-coral)"
+                                  />
+                                  {visiblePasswords.has(student.id)
+                                    ? student.password
+                                    : "••••••••"}
+                                  <button
+                                    onClick={() => togglePassword(student.id)}
+                                    className="text-(--wwf-ocean) hover:text-(--wwf-coral)"
+                                  >
+                                    {visiblePasswords.has(student.id) ? (
+                                      <EyeOff size={12} />
+                                    ) : (
+                                      <Eye size={12} />
+                                    )}
+                                  </button>
+                                </div>
+                              </>
+                            ) : (
+                              <div className="mt-1 text-xs font-semibold text-(--wwf-ocean-deep)/40">
+                                Uses email/phone login — self-service password
+                                reset available
                               </div>
                             )}
                           </div>

@@ -11,6 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
+  MapPin,
+  Building2,
 } from "lucide-react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -20,8 +22,10 @@ import { exportAdminDataToCSV } from "@/lib/exportCsv"
 import { StudentsTable } from "./StudentsTable"
 import type { AdminStats, AdminSchool, AdminStudent } from "@/types/admin"
 import { QueryProvider } from "../providers/QueryProvider"
+import { SchoolParticipationTable } from "./SchoolParticipationTable"
+import { StateStatsTable } from "./StateStatsTable"
 
-type TabType = "students"
+type TabType = "students" | "states"
 
 function AdminDashboardContent() {
   const { user } = useAuth()
@@ -33,6 +37,7 @@ function AdminDashboardContent() {
   const [searchInput, setSearchInput] = useState("")
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [stateFilter, setStateFilter] = useState<string>("")
 
   // debounce the search box
   useEffect(() => {
@@ -40,10 +45,9 @@ function AdminDashboardContent() {
     return () => clearTimeout(timer)
   }, [searchInput])
 
-  // reset to page 1 whenever a filter changes
   useEffect(() => {
     setPage(1)
-  }, [search, schoolFilter, statusFilter, topFilter])
+  }, [search, schoolFilter, statusFilter, stateFilter, topFilter])
 
   const PLATFORM_SLUG = import.meta.env.PUBLIC_PLATFORM_SLUG || "wildwisdom"
 
@@ -60,17 +64,9 @@ function AdminDashboardContent() {
       (await api.get(`/admin/${PLATFORM_SLUG}/schools`)).data.data,
   })
 
-  // const { data: students, isLoading: loadingStudents } = useQuery<
-  //   AdminStudent[]
-  // >({
-  //   queryKey: ["adminStudents", schoolFilter, PLATFORM_SLUG],
-  //   queryFn: async () => {
-  //     const endpoint = schoolFilter
-  //       ? `/admin/${PLATFORM_SLUG}/students?school_id=${schoolFilter}`
-  //       : `/admin/${PLATFORM_SLUG}/students`
-  //     return (await api.get(endpoint)).data.data
-  //   },
-  // })
+  const uniqueStates = Array.from(
+    new Set(schools?.map((s) => s.school_state).filter(Boolean))
+  ).sort()
 
   interface PaginatedStudents<T> {
     data: T[]
@@ -88,6 +84,7 @@ function AdminDashboardContent() {
       schoolFilter,
       topFilter,
       statusFilter,
+      stateFilter,
       search,
       PLATFORM_SLUG,
     ],
@@ -96,6 +93,7 @@ function AdminDashboardContent() {
 
       if (schoolFilter) params.append("school_id", schoolFilter)
       if (statusFilter !== "all") params.append("status", statusFilter)
+      if (stateFilter) params.append("state", stateFilter) // NEW
       if (search) params.append("search", search)
 
       if (topFilter !== "all") {
@@ -115,7 +113,6 @@ function AdminDashboardContent() {
 
   // --- Handlers ---
   const handleExportCurrentView = () => {
-    // MUST be exactly "students" to match your export function's types
     exportAdminDataToCSV("students", displayedStudents)
   }
 
@@ -227,16 +224,7 @@ function AdminDashboardContent() {
         onValueChange={handleTabChange}
         className="w-full space-y-6"
       >
-        <div className="flex flex-col gap-4 rounded-[1.5rem] border border-(--wwf-ocean-light)/15 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-          <TabsList className="flex w-full flex-wrap justify-start gap-2 bg-transparent p-0 sm:w-auto sm:flex-nowrap md:h-auto">
-            <TabsTrigger
-              value="students"
-              className="flex-1 rounded-xl px-3 py-3 text-xs font-bold text-(--wwf-ocean-deep) transition-all data-[state=active]:bg-(--wwf-ocean-deep) data-[state=active]:text-white data-[state=active]:shadow-md sm:flex-none md:px-6 md:text-sm"
-            >
-              Students Leaderboard
-            </TabsTrigger>
-          </TabsList>
-
+        <div className="flex flex-col gap-4 rounded-[1.5rem] border border-(--wwf-ocean-light)/15 bg-white p-4 shadow-sm sm:items-center sm:justify-between">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative w-full sm:w-56">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-(--wwf-ocean)">
@@ -251,7 +239,6 @@ function AdminDashboardContent() {
               />
             </div>
 
-            {/* NEW: Status filter */}
             <div className="relative w-full sm:w-44">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-(--wwf-ocean)">
                 <UserCheck size={16} />
@@ -267,24 +254,22 @@ function AdminDashboardContent() {
                 <option value="completed">Completed</option>
               </select>
             </div>
-            <div className="relative w-full sm:w-40">
+
+            <div className="relative w-full sm:w-64">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-(--wwf-ocean)">
-                <Trophy size={16} />
+                <Filter size={16} />
               </div>
               <select
-                value={topFilter}
-                onChange={(e) =>
-                  setTopFilter(
-                    e.target.value === "all" ? "all" : Number(e.target.value)
-                  )
-                }
+                value={stateFilter}
+                onChange={(e) => setStateFilter(e.target.value)}
                 className="h-12 w-full appearance-none rounded-xl border border-(--wwf-ocean-light)/20 bg-[#F8FAFC] pr-4 pl-11 text-sm font-bold text-(--wwf-ocean-deep) shadow-sm transition-all outline-none focus:border-(--wwf-ocean) focus:bg-white"
               >
-                <option value="all">All Students</option>
-                <option value={5}>Top 5</option>
-                <option value={10}>Top 10</option>
-                <option value={50}>Top 50</option>
-                <option value={100}>Top 100</option>
+                <option value="">Filter: All States</option>
+                {uniqueStates.map((state) => (
+                  <option key={state} value={state}>
+                    {state}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -306,9 +291,27 @@ function AdminDashboardContent() {
               </select>
             </div>
           </div>
+
+          <TabsList className="flex w-full flex-wrap justify-start gap-2 bg-transparent p-0 sm:w-auto sm:flex-nowrap md:h-auto">
+            <TabsTrigger
+              value="students"
+              className="flex-1 rounded-xl px-3 py-3 text-xs font-bold text-(--wwf-ocean-deep) transition-all data-[state=active]:bg-(--wwf-ocean-deep) data-[state=active]:text-white data-[state=active]:shadow-md sm:flex-none md:px-6 md:text-sm"
+            >
+              Students Leaderboard
+            </TabsTrigger>
+            <TabsTrigger
+              className="flex-1 rounded-xl px-3 py-3 text-xs font-bold text-(--wwf-ocean-deep) transition-all data-[state=active]:bg-(--wwf-ocean-deep) data-[state=active]:text-white data-[state=active]:shadow-md sm:flex-none md:px-6 md:text-sm"
+              value="states"
+            >
+              State-wise Data
+            </TabsTrigger>
+          </TabsList>
         </div>
 
         <div className="overflow-hidden rounded-[2rem] border border-(--wwf-ocean-light)/15 bg-white shadow-md">
+          {/* ================================== */}
+          {/* STUDENTS TAB CONTENT */}
+          {/* ================================== */}
           <TabsContent value="students" className="mt-0 outline-none">
             <StudentsTable
               students={displayedStudents}
@@ -317,7 +320,81 @@ function AdminDashboardContent() {
             />
           </TabsContent>
 
-          {topFilter === "all" &&
+          {/* ================================== */}
+          {/* STATES TAB CONTENT (Nested Tabs) */}
+          {/* ================================== */}
+          <TabsContent value="states" className="mt-0 outline-none">
+            <Tabs defaultValue="summary" className="w-full">
+              <div className="border-b border-(--wwf-ocean-light)/10 bg-linear-to-r from-[#F8FAFC] to-white p-4 sm:px-6">
+                <TabsList className="flex w-full justify-start gap-3 bg-transparent p-0 sm:w-auto">
+                  <TabsTrigger
+                    value="summary"
+                    className="rounded-xl px-5 py-4 text-xs font-bold text-(--wwf-ocean-deep) transition-all data-[state=active]:bg-(--wwf-ocean-light)/15 data-[state=active]:text-(--wwf-ocean-deep) md:text-sm"
+                  >
+                    State Summary
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="schools"
+                    className="rounded-xl px-5 py-4 text-xs font-bold text-(--wwf-ocean-deep) transition-all data-[state=active]:bg-(--wwf-sea-green)/15 data-[state=active]:text-(--wwf-ocean-deep) md:text-sm"
+                  >
+                    School Participation
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              {/* Sub-Tab 1: State Summary Table */}
+              <TabsContent value="summary" className="m-0 outline-none">
+                <div className="flex flex-col bg-white">
+                  <div className="flex flex-col gap-1 border-b border-(--wwf-ocean-light)/10 p-6 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-(--wwf-ocean-light)/10 text-(--wwf-ocean-deep)">
+                        <MapPin size={24} />
+                      </div>
+                      <div>
+                        <h3 className="font-wwf text-2xl text-(--wwf-ocean-deep)">
+                          State-wise Summary
+                        </h3>
+                        <p className="mt-0.5 text-sm font-semibold text-(--wwf-ocean-deep)/60">
+                          Expected vs. registered students, aggregated by state.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full overflow-x-auto">
+                    <StateStatsTable categorySlug={PLATFORM_SLUG} />
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Sub-Tab 2: School Participation Table */}
+              <TabsContent value="schools" className="m-0 outline-none">
+                <div className="flex flex-col bg-white">
+                  <div className="flex flex-col gap-1 border-b border-(--wwf-ocean-light)/10 p-6 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-(--wwf-sea-green)/15 text-(--wwf-ocean-deep)">
+                        <Building2 size={24} />
+                      </div>
+                      <div>
+                        <h3 className="font-wwf text-2xl text-(--wwf-ocean-deep)">
+                          School Participation
+                        </h3>
+                        <p className="mt-0.5 text-sm font-semibold text-(--wwf-ocean-deep)/60">
+                          Which specific schools have started the quiz.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full overflow-x-auto">
+                    <SchoolParticipationTable categorySlug={PLATFORM_SLUG} />
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+
+          {/* Student Pagination Controls (Only visible on the Students tab) */}
+          {activeTab === "students" &&
+            topFilter === "all" &&
             paginationData &&
             paginationData.last_page > 1 && (
               <div className="flex flex-col items-center justify-between gap-4 border-t border-(--wwf-ocean-light)/10 bg-white/50 px-6 py-5 sm:flex-row">
