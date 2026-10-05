@@ -22,7 +22,7 @@ const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "")
       >
       </div>
     </div>
-    <div class="absolute top-40 right-5 z-19 md:right-[12%]">
+    <div class="absolute top-40 right-5 z-19 hidden sm:block md:right-[12%]">
       <AnimatedBossCrab client:load />
     </div>
 
@@ -68,6 +68,19 @@ const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "")
         >
           Enter your school code and create your profile to start playing.
         </p>
+        <div class="relative mt-6 flex max-w-xl items-center justify-center">
+          {/* Pulsing blurred glow behind the whole banner */}
+          <span
+            class="pointer-events-none absolute -inset-1 animate-pulse rounded-xl bg-[var(--wwf-orange)] opacity-50 blur-md"
+          ></span>
+
+          {/* The main banner */}
+          <p
+            class="relative z-10 w-full rounded-xl bg-[var(--wwf-orange)] px-6 py-4 text-center text-base font-black tracking-wide text-white uppercase shadow-lg md:text-lg"
+          >
+            Classroom Challenge Round date EXTENDED — now open till 3rd of October 2026
+          </p>
+        </div>
       </div>
 
       <div

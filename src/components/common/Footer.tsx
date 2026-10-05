@@ -336,7 +336,7 @@ export default function FooterSection() {
               </p>
 
               <div
-                className="flex w-full max-w-[320px] items-center gap-4 rounded-md px-5 py-4"
+                className="flex w-full max-w-[320px] gap-4 rounded-md px-5 py-4"
                 style={{ border: "1px solid white" }}
               >
                 <svg
@@ -358,8 +358,12 @@ export default function FooterSection() {
                 </svg>
 
                 <div className="text-lg leading-tight font-medium">
-                  <span className="block">Last Date to Register</span>
-                  <span className="block">15th August, 2025</span>
+                  {/* <span className="block">Last Date to Register</span>
+                  <span className="block">15th August, 2025</span> */}
+
+
+                  Classroom Challenge Round date EXTENDED — now open till 3rd of October 2026!
+
                 </div>
               </div>
             </div>

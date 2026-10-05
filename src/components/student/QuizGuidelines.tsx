@@ -67,6 +67,24 @@ function QuizGuidelinesContent() {
             <p className="mt-1 text-sm text-slate-500">
               Classroom Challenge Round - structure & instructions.
             </p>
+            <div className="relative mt-6 flex max-w-xl items-center justify-center">
+              {/* Left accent pulse glow */}
+              <span className="pointer-events-none absolute top-0 bottom-0 -left-2 w-6 animate-pulse rounded-l-xl bg-[var(--wwf-orange)] opacity-60 blur-md" />
+
+              {/* Main container with heavy left border */}
+              <div className="relative z-10 w-full overflow-hidden rounded-xl border border-l-8 border-[var(--wwf-ocean-light)] border-l-[var(--wwf-orange)] bg-[var(--wwf-ocean-semi-dark)] px-6 py-4 shadow-lg">
+                <p className="text-center text-lg font-medium text-[var(--wwf-white)] md:text-xl">
+                  Classroom Challenge Round date{" "}
+                  <span className="font-black tracking-wide text-[var(--wwf-orange)] uppercase">
+                    EXTENDED
+                  </span>{" "}
+                  <br className="hidden sm:block" />— now open till{" "}
+                  <span className="font-bold text-[var(--wwf-coral)]">
+                    3rd of October 2026
+                  </span>
+                </p>
+              </div>
+            </div>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             {/* Register CTA — only for guests */}

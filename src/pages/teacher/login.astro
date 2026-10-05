@@ -38,6 +38,30 @@ const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "")
           >
             Sign in to manage your classroom.
           </p>
+          <div class="relative mt-6 flex max-w-xl items-center justify-center">
+            {/* Outer blurred pulse */}
+            <span
+              class="pointer-events-none absolute -inset-1 animate-pulse rounded-xl bg-[var(--wwf-orange)] opacity-40 blur-md"
+            ></span>
+
+            {/* Dashed border container */}
+            <div
+              class="relative z-10 w-full rounded-xl border-2 border-dashed border-[var(--wwf-orange)] bg-[var(--wwf-ocean-semi-dark)] px-6 py-4 text-center shadow-[0_0_15px_rgba(247,134,35,0.2)]"
+            >
+              <p class="text-lg font-medium text-[var(--wwf-white)] md:text-xl">
+                Classroom Challenge Round date{" "}
+                <span
+                  class="font-black tracking-wider text-[var(--wwf-orange)] uppercase drop-shadow-md"
+                >
+                  Extended
+                </span>{" "}
+                <br class="hidden sm:block" />
+                — now open till <span class="font-bold text-[var(--wwf-coral)]"
+                  >3rd of October 2026</span
+                >
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* GLASSMORPHIC CARD */}

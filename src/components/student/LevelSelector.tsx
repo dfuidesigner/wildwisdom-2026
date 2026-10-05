@@ -375,7 +375,7 @@ function LevelSelectorContent() {
             />
           </div>
 
-          <div className="absolute -top-5 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border-2 border-(--wwf-border) bg-white px-8 py-2.5 text-sm font-black tracking-widest whitespace-nowrap text-(--wwf-ocean-deep) uppercase shadow-lg md:text-base">
+          <div className="absolute -top-5 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border-2 border-(--wwf-border) bg-white px-8 py-2.5 text-xs font-black tracking-widest whitespace-nowrap text-(--wwf-ocean-deep) uppercase shadow-lg sm:text-sm md:text-base">
             <GraduationCap size={20} className="text-(--wwf-sea-green)" />
             {data?.quiz.title || "Wild Wisdom QUIZ 2026"}
           </div>
@@ -384,6 +384,24 @@ function LevelSelectorContent() {
             <h1 className="font-wwf text-3xl leading-tight font-bold text-(--wwf-ocean-deep) md:text-4xl lg:text-5xl">
               WWGC Classroom Challenge
             </h1>
+
+            <div className="relative mt-6 flex items-center justify-center">
+              {/* The outer orange glow */}
+              <span className="pointer-events-none absolute -inset-1 animate-pulse rounded-xl bg-[var(--wwf-orange)] opacity-50 blur-md" />
+
+              {/* Dark container to make the bright text pop */}
+              <p className="relative z-10 w-full rounded-xl border-2 border-[var(--wwf-orange)] bg-[var(--wwf-ocean-semi-dark)] px-6 py-4 text-center text-lg font-medium text-[var(--wwf-white)] shadow-lg md:text-xl">
+                Classroom Challenge Round date{" "}
+                <span className="font-black tracking-wide text-[var(--wwf-orange)]">
+                  EXTENDED
+                </span>
+                <br className="hidden sm:block" />— now open till{" "}
+                <span className="font-bold text-[var(--wwf-coral)]">
+                  3rd of October 2026
+                </span>
+              </p>
+            </div>
+
             <p className="text-sm leading-relaxed font-medium text-slate-600 md:text-base lg:text-lg">
               The WWGC Classroom Challenge is the first round of the competition
               and will be conducted virtually through participating schools.
